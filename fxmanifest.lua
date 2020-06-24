@@ -31,18 +31,18 @@ files {
 	--'html/css/reset.css',		--Work In Progress
 	--'html/css/style.css',		--Work In Progress
 	--'html/js/listener.js'		--Work In Progress
-    'stream/McDonaldsVan/CarData/vehicles.meta',
-    'stream/McDonaldsVan/CarData/carvariations.meta',
-    'stream/McDonaldsVan/CarData/handling.meta',
-    'stream/McDonaldsVan/CarData/dlctext.meta',
-    'stream/McDonaldsVan/CarData/carcols.meta'
+    'stream/CarData/vehicles.meta',
+    'stream/CarData/carvariations.meta',
+    'stream/CarData/handling.meta',
+    'stream/CarData/dlctext.meta',
+    'stream/CarData/carcols.meta'
 }
 
-data_file 'CARCOL_FILE' 'stream/McDonaldsVan/CarData/carcol.meta'
-data_file 'VEHICLE_VARIATION_FILE' 'stream/McDonaldsVan/CarData/carvariations.meta'
-data_file 'DLCTEXT_FILE' 'stream/McDonaldsVan/CarData/dlctext.meta'
-data_file 'HANDLING_FILE' 'stream/McDonaldsVan/CarData/handling.meta'
-data_file 'VEHICLE_METADATA_FILE' 'stream/McDonaldsVan/CarData/vehicles.meta'
+data_file 'CARCOL_FILE' 'stream/CarData/carcol.meta'
+data_file 'VEHICLE_VARIATION_FILE' 'stream/CarData/carvariations.meta'
+data_file 'DLCTEXT_FILE' 'stream/CarData/dlctext.meta'
+data_file 'HANDLING_FILE' 'stream/CarData/handling.meta'
+data_file 'VEHICLE_METADATA_FILE' 'stream/CarData/vehicles.meta'
 
 dependencies {
 	'es_extended',
