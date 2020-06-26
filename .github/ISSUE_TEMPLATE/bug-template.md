@@ -1,13 +1,13 @@
 ---
-name: HELP TEMPLATE
-about: This Template is used when needing Help
-title: "[HELP]"
-labels: help wanted
+name: BUG TEMPLATE
+about: This Template is used when creating a Bug Report
+title: "[BUG]"
+labels: bug
 assignees: FuryFight3r
 
 ---
 
-Please do NOT remove any text from the template, only change the title and add your answers below, if you have more information by all means add it, but do not remove any details already existing below, this will void your request and we will not respond if it is not filled out correctly.
+Please do NOT remove any text from the template, only add your title and add your answers below, if you have more information by all means add it, but do not remove any details already existing below, this will void your request and we will not respond if it is not filled out correctly.
 
 **Disclaimer**
 Due to the fact that people are providing such little information and expecting us to be able to fix their problem, we are now enforcing these issue templates through github, if you fill these forms out incorrectly or provide little information, then expect little help in return, we, as addon creators spend hours/days/weeks and even months and years doing this for FREE, both creating addons and giving support, so please show some courtesy and atleast have a fair go at diagnosing and fixing your problem before creating a post and possibly wasting not only your own time, but the people that are trying to create resources for server owners like you. 
@@ -46,36 +46,25 @@ Answer:
 Are the addons that this resource requires and the DGRP_McDonaldsJob up-to-date?
 Answer:
 
-**System/Server Specs**
-What are your system/server specs?
-Home Hosted or Server Hosted(Zap Hosted)?
-Answer:
-(if Home Hosted answer below questions)
-Operating System:
-RAM:
-GPU:
-CPU:
-
-**Describe the problem**
-A clear and concise description of what the problem is.
+**Describe the bug**
+A clear and concise description of what the bug is.
 Describe:
 
-**Screenshots**
-Add screenshots to help explain your problem.
-Screenshots:
+**To Reproduce**
+If you received the bug, what can we do to receive that same bug?:
+1. 
+2. 
+3. 
+4. 
 
-**Extra Details**
-Did you modify any DGRP_McDonaldsJob scripts in anyway(besides the config)?
-Answer:
-Is the entire server receiving this problem or only you?
-Answer:
-Have you tried the basic diagnotics such as typing in chat '/restart dgrp_mcdonaldsjob' then '/setjob ID McDonalds 1' also restarting your server?
-Answer:
-If you answered yes to the above are you receiving any errors in the 'f8' console or the server console in relation to dgrp_mcdonaldsjob when restarting the resource or setting your job?
-Answer:
-If you answered yes to the above what error are you receiving and did you provide a sceenshot of it?
-Answer:
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+Screenshots:
 
 **READ**
 Did you read the FAQ's to make sure your not asking something that is already frequently asked?
 Answer:
+
+**Additional context**
+Add any other context about the problem here.
+Describe:
