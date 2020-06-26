@@ -1,6 +1,6 @@
 ---
 name: HELP TEMPLATE
-about: "*PUT A CLEAR TITLE HERE*"
+about: This Template is used when needing Help
 title: "[HELP]"
 labels: help wanted
 assignees: FuryFight3r
