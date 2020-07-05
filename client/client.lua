@@ -76,7 +76,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(2)					
 		if not menuIsOpen then
 			local playerCoords = GetEntityCoords(GetPlayerPed(-1))
-            if currentPlayerJobName ~= nil then														
+            if currentPlayerJobName ~= nil and currentPlayerJobName == 'McDonalds' then														
 			    if  playerIsInside(playerCoords, Config.JobMenuCoords, Config.JobMarkerDistance) then 				
 			        isInMarker = true
 			        displayHint = true																
@@ -217,7 +217,7 @@ end)
 
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
-    currentPlayerData.job = job
+    --currentPlayerData.job = job
     currentPlayerJobName = job.name
     if job.name == jobTitle then 
         onDuty = true
