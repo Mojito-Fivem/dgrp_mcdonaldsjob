@@ -21,6 +21,7 @@ Locales['en'] = {
   ['MealNotifFinish'] = "Finished preparing McDonalds Meal.",
   ['MealBar'] = "Preparing McDonalds Meal",
   ['TakeOrder'] = "~b~Press ~INPUT_CONTEXT~ to take ~g~Customers~b~ Order.",
+  ['GrabOrder'] = "~b~Press ~INPUT_CONTEXT~ to get ~g~Customers~b~ Meal.",
   ['CashError'] = "You have already been given an order!",
   ['CashStart'] = "Started taking McDonalds Order.",
   ['CashFinish'] = "Finished taking McDonalds Order.",
