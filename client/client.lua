@@ -75,6 +75,8 @@ local playerBusy = false
 
 local hasStartedBlips = false
 
+local mealInvent = 0
+
 --Press [E] Buttons
 Citizen.CreateThread(function()
 	while true do																
@@ -122,22 +124,7 @@ Citizen.CreateThread(function()
 			    	displayHint = true																
 			    	hintToDisplay = _U('TakeOrder')									
 			    	currentZone = 'cOrder'
-                elseif  playerIsInside(playerCoords, Config.CashTakeOrder3, Config.JobMarkerDistance) and currentJob == 'cashier' and hasTakenOrder == false then 				
-                    isInMarker = true
-			    	displayHint = true																
-			    	hintToDisplay = _U('TakeOrder')									
-			    	currentZone = 'cOrder'
-                elseif  playerIsInside(playerCoords, Config.CashTakeOrder4, Config.JobMarkerDistance) and currentJob == 'cashier' and hasTakenOrder == false then 				
-                    isInMarker = true
-			    	displayHint = true																
-			    	hintToDisplay = _U('TakeOrder')									
-			    	currentZone = 'cOrder'
-                elseif  playerIsInside(playerCoords, Config.CashTakeOrder5, Config.JobMarkerDistance) and currentJob == 'cashier' and hasTakenOrder == false then 				
-                    isInMarker = true
-			    	displayHint = true																
-			    	hintToDisplay = _U('TakeOrder')									
-			    	currentZone = 'cOrder'
-			    elseif  playerIsInside(playerCoords, Config.CashCollectMeal, Config.JobMarkerDistance) and currentJob == 'cashier' and hasOrder == false then 				
+			    elseif  playerIsInside(playerCoords, Config.CashCollectMeal, Config.JobMarkerDistance) and currentJob == 'cashier' and hasOrder == false and hasTakenOrder == true then 				
 			    	isInMarker = true
 			    	displayHint = true																
 			    	hintToDisplay = _U('GrabOrder')								
@@ -269,9 +256,6 @@ Citizen.CreateThread(function()
                     displayMarker(Config.CashTakeOrder)
                     displayMarker(Config.CashTakeOrder1)
                     displayMarker(Config.CashTakeOrder2)
-                    displayMarker(Config.CashTakeOrder3)
-                    displayMarker(Config.CashTakeOrder4)
-                    displayMarker(Config.CashTakeOrder5)
                 elseif hasTakenOrder and hasOrder == false then
                     displayMarker(Config.CashCollectMeal)
                 end
@@ -388,39 +372,81 @@ function getDrink()
     end
 end
 
+RegisterNetEvent("dgrp_mcdonalds:setInvent")
+AddEventHandler("dgrp_mcdonalds:setInvent", function(amount)
+    mealInvent = amount
+end)
+
 function prepareMeal()
-    if invBurger > 0 and invDrink > 0 and invFries > 0 then
-        --Alerts | alert | notice | info | success | error 
-        playerIsBusy(true)
-        startAnim("misscarsteal2fixer", "confused_a")
-        exports.pNotify:SendNotification({text = _U('MealNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        exports['progressBars']:startUI(Config.CookPrepareTime, _U('MealBar'))
-        Citizen.Wait(Config.CookPrepareTime)
-        ClearPedTasks(PlayerPedId())
-        exports.pNotify:SendNotification({text = _U('MealNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
-        invBurger = invBurger - 1
-        invDrink = invDrink - 1
-        invFries = invFries - 1
-        mealsMade = mealsMade + 1
-        TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
-        TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
-        TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
-        if Config.EnableMoreWorkMorePay == true then
-            bonus = 1 * mealsMade
-            payBonus = Config.CashJobPay * bonus
-            TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
-            if mealsMade > 1 then
-                ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+    if Config.EnableMealInventory == true then
+        if invBurger > 0 and invDrink > 0 and invFries > 0 then
+            --Alerts | alert | notice | info | success | error 
+            playerIsBusy(true)
+            startAnim("misscarsteal2fixer", "confused_a")
+            exports.pNotify:SendNotification({text = _U('MealNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports['progressBars']:startUI(Config.CookPrepareTime, _U('MealBar'))
+            Citizen.Wait(Config.CookPrepareTime)
+            ClearPedTasks(PlayerPedId())
+            exports.pNotify:SendNotification({text = _U('MealNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+            invBurger = invBurger - 1
+            invDrink = invDrink - 1
+            invFries = invFries - 1
+            mealsMade = mealsMade + 1
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
+            TriggerServerEvent("dgrp_mcdonalds:addToMealInvent")
+            if Config.EnableMoreWorkMorePay == true then
+                bonus = 1 * mealsMade
+                payBonus = Config.CashJobPay * bonus
+                TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
+                if mealsMade > 1 then
+                    ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+                end
+                ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+            else
+                TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
+                ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
             end
-            ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+            playerIsBusy(false)
         else
-            TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
-            ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+            exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         end
-        playerIsBusy(false)
     else
-        exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if invBurger > 0 and invDrink > 0 and invFries > 0 then
+            --Alerts | alert | notice | info | success | error 
+            playerIsBusy(true)
+            startAnim("misscarsteal2fixer", "confused_a")
+            exports.pNotify:SendNotification({text = _U('MealNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports['progressBars']:startUI(Config.CookPrepareTime, _U('MealBar'))
+            Citizen.Wait(Config.CookPrepareTime)
+            ClearPedTasks(PlayerPedId())
+            exports.pNotify:SendNotification({text = _U('MealNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+            invBurger = invBurger - 1
+            invDrink = invDrink - 1
+            invFries = invFries - 1
+            mealsMade = mealsMade + 1
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
+            TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
+            if Config.EnableMoreWorkMorePay == true then
+                bonus = 1 * mealsMade
+                payBonus = Config.CashJobPay * bonus
+                TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
+                if mealsMade > 1 then
+                    ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+                end
+                ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+            else
+                TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
+                ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+            end
+            playerIsBusy(false)
+        else
+            exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     end
 end
 
@@ -446,29 +472,61 @@ function takeOrder()
 end
 
 function pickupOrder()
-    if hasOrder == false and hasTakenOrder == true then
-        playerIsBusy(true)
-        exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        exports['progressBars']:startUI(Config.CashMealTime, _U('PickupBar'))
-        startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
-        Citizen.Wait(4000)
-        ClearPedTasks(PlayerPedId())
-        startAnim("misscarsteal2fixer", "confused_a")
-        Citizen.Wait(Config.CashMealTime - 4000)
-        ClearPedTasks(PlayerPedId())
-        ClearPedTasks(PlayerPedId())
-        TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-        exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
-        invMeal = invMeal + 1
-        hasOrder = true
-        setDelivery()
-        playerIsBusy(false)
-    elseif hasOrder == true and hasTakenOrder == true then
-        exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-    elseif hasTakenOrder == false and hasOrder == false then
-        exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    if Config.EnableMealInventory == true then
+        if hasOrder == false and hasTakenOrder == true then
+            if mealInvent > 0 then
+                TriggerServerEvent("dgrp_mcdonalds:removeFromMealInvent")
+                playerIsBusy(true)
+                exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                exports['progressBars']:startUI(Config.CashMealTime, _U('PickupBar'))
+                startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
+                Citizen.Wait(4000)
+                ClearPedTasks(PlayerPedId())
+                startAnim("misscarsteal2fixer", "confused_a")
+                Citizen.Wait(Config.CashMealTime - 4000)
+                ClearPedTasks(PlayerPedId())
+                ClearPedTasks(PlayerPedId())
+                TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
+                exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+                invMeal = invMeal + 1
+                hasOrder = true
+                setDelivery()
+                playerIsBusy(false)
+            else
+                exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            end
+        elseif hasOrder == true and hasTakenOrder == true then
+            exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif hasTakenOrder == false and hasOrder == false then
+            exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        else
+            exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     else
-        exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if hasOrder == false and hasTakenOrder == true then
+            playerIsBusy(true)
+            exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports['progressBars']:startUI(Config.CashMealTime, _U('PickupBar'))
+            startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
+            Citizen.Wait(4000)
+            ClearPedTasks(PlayerPedId())
+            startAnim("misscarsteal2fixer", "confused_a")
+            Citizen.Wait(Config.CashMealTime - 4000)
+            ClearPedTasks(PlayerPedId())
+            ClearPedTasks(PlayerPedId())
+            TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
+            exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+            invMeal = invMeal + 1
+            hasOrder = true
+            setDelivery()
+            playerIsBusy(false)
+        elseif hasOrder == true and hasTakenOrder == true then
+            exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif hasTakenOrder == false and hasOrder == false then
+            exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        else
+            exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     end
 end
 
@@ -519,23 +577,49 @@ function deliverOrder()
 end
 
 function pickupDelivery()
-    if dHasOrder == false then
-        playerIsBusy(true)
-        startAnim("misscarsteal2fixer", "confused_a")
-        exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        exports['progressBars']:startUI(Config.CashMealTime, "Collecting McDonalds Order")
-        Citizen.Wait(Config.CashMealTime)
-        ClearPedTasks(PlayerPedId())
-        TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-        exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
-        invMeal = invMeal + 1
-        dHasOrder = true
-        setDriveDelivery()
-        playerIsBusy(false)
-    elseif dHasOrder == true then
-        exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    if Config.EnableMealInventory == true then
+        if mealInvent > 0 then
+            if dHasOrder == false then
+                TriggerServerEvent("dgrp_mcdonalds:removeFromMealInvent")
+                playerIsBusy(true)
+                startAnim("misscarsteal2fixer", "confused_a")
+                exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                exports['progressBars']:startUI(Config.CashMealTime, "Collecting McDonalds Order")
+                Citizen.Wait(Config.CashMealTime)
+                ClearPedTasks(PlayerPedId())
+                TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
+                exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+                invMeal = invMeal + 1
+                dHasOrder = true
+                setDriveDelivery()
+                playerIsBusy(false)
+            elseif dHasOrder == true then
+                exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            else
+                exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            end
+        else
+            exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     else
-        exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if dHasOrder == false then
+            playerIsBusy(true)
+            startAnim("misscarsteal2fixer", "confused_a")
+            exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            exports['progressBars']:startUI(Config.CashMealTime, "Collecting McDonalds Order")
+            Citizen.Wait(Config.CashMealTime)
+            ClearPedTasks(PlayerPedId())
+            TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
+            exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+            invMeal = invMeal + 1
+            dHasOrder = true
+            setDriveDelivery()
+            playerIsBusy(false)
+        elseif dHasOrder == true then
+            exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        else
+            exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     end
 end
 
@@ -773,7 +857,6 @@ function playerIsBusy(bool)
 end
 
 function displayMarker(coords)
-            --Type  |X|         Y|      Z|      dX|  dY|  dZ| rX| rY|  rZ|  sX|  sY|  sZ|          R|                          G|                      B|                      A|            Animate|FC| P19|  rot|texDict|texName|ents
     if playerBusy == false then
         DrawMarker(1, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 1.0, 1.0, 1.0, Config.JobMarkerColor.r, Config.JobMarkerColor.g, Config.JobMarkerColor.b, Config.JobMarkerColor.a, true, true, 2, false, false, false, false) 
     end
@@ -883,4 +966,81 @@ function startAnim(lib, anim)
 	ESX.Streaming.RequestAnimDict(lib, function()
 		TaskPlayAnim(PlayerPedId(), lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
 	end)
+end
+
+Citizen.CreateThread(function()
+    if Config.EnableStuckCommand == true then
+        RegisterCommand("mcstuck", function()
+            playerIsBusy(false)
+        end)
+    end
+
+    if Config.EnableCookCommand == true then
+        RegisterCommand("mccook", function()
+            currentJob = 'cook'
+            --Change Job Grade Here
+            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+            onDuty = true
+            isDelivering = false
+            invMeal = 0
+            invBurger = 0
+            invDrink = 0
+            invFries = 0
+            hasOrder = false
+            hasTakenOrder = false
+        end)
+    end
+
+    if Config.EnableCashCommand == true then
+        RegisterCommand("mccash", function()
+            currentJob = 'cashier'
+            --Change Job Grade Here
+            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+            onDuty = true
+            isDelivering = false
+            invMeal = 0
+            invBurger = 0
+            invDrink = 0
+            invFries = 0
+            hasOrder = false
+            hasTakenOrder = false
+        end)
+    end
+
+    if Config.EnableDelivCommand == true then
+        RegisterCommand("mcdeliv", function()
+            currentJob = 'deliv'
+            --Change Job Grade Here
+            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+            onDuty = true
+            isDelivering = false
+            invMeal = 0
+            invBurger = 0
+            invDrink = 0
+            invFries = 0
+            hasOrder = false
+            hasTakenOrder = false
+        end)
+    end
+
+end)
+
+--Testing Commands
+
+RegisterCommand("order", function()
+    Citizen.CreateThread(function()
+        takeOrder()
+        TriggerEvent("chat:addMessage", {args={Config.Prefix.."Ordering Meal"}}) 
+    end)
+end)
+
+RegisterCommand("addMeal", function()
+    Citizen.CreateThread(function()
+        TriggerServerEvent("dgrp_mcdonalds:addToMealInvent")
+        TriggerEvent("chat:addMessage", {args={Config.Prefix.."Adding Meal to Kitchen Invetory"}}) 
+    end)
+end)
+
+function dPrint(msg)
+    print(""..Config.Prefix..""..msg..".")
 end

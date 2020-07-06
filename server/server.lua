@@ -1,9 +1,31 @@
 ESX = nil
 
+local currentMeals = 0
+
 if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == 'dgrp_mcdonaldsjob' or GetCurrentResourceName() == 'dgrp_mcdonaldsjob-master' then
   print("DefectGaming's McDonalds Job Successfully Loaded")
 
 	TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) 
+
+	RegisterServerEvent('dgrp_mcdonalds:addToMealInvent')
+		AddEventHandler('dgrp_mcdonalds:addToMealInvent', function()
+			currentMeals = currentMeals + 1
+			print("Current Meals are now: "..currentMeals)
+			TriggerClientEvent("dgrp_mcdonalds:setInvent", source, currentMeals)
+	end)
+
+	RegisterServerEvent('dgrp_mcdonalds:removeFromMealInvent')
+		AddEventHandler('dgrp_mcdonalds:removeFromMealInvent', function()
+			currentMeals = currentMeals - 1
+			print("Current Meals are now: "..currentMeals)
+			TriggerClientEvent("dgrp_mcdonalds:setInvent", source, currentMeals)
+	end)
+
+	RegisterServerEvent('dgrp_mcdonalds:getMealAmount')
+		AddEventHandler('dhrp_mcdonalds:getMealAmount', function()
+		TriggerClientEvent("dgrp_mcdonalds:setInvent", source, currentMeals)
+		print("Current Meals are: "..currentMeals)
+	end)
 
 	RegisterServerEvent('dgrp_mcdonalds:getPaid')
 		AddEventHandler('dgrp_mcdonalds:getPaid', function(amount)

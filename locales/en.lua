@@ -29,6 +29,7 @@ Locales['en'] = {
   ['PickupError'] = "You already have a meal to deliver!",
   ['PickupError1'] = "You do not have any active orders!",
   ['PickupError2'] = "ERROR! Please Contact Dev: You Somehow picked up an order without taking an order.",
+  ['PickupError3'] = "The Cook has not prepared any meals! Tell them to make you one.",
   ['PickupStart'] = "Started collecting McDonalds Order.",
   ['PickupFinish'] = "Finished collecting McDonalds Order.",
   ['PickupBar'] = "Collecting McDonalds Order",

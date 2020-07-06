@@ -9,6 +9,10 @@ Config.EnablePlayerCook		= true		--Cook gets drinks, makes burgers and fries and
 Config.EnablePlayerClerk	= true		--Clerk receives orders, gives to cook, receives orders from cook, and gives to customer. 				
 Config.EnablePlayerDriver	= true		--Driver delivers orders marked for delivery.
 
+Config.CashJobLimit			= 3			--The amount of staff that can be in a job at a time COMING SOON
+Config.CookJobLimit			= 3			--			    "                "
+Config.DelivJobLimit		= 7			--			    "                "
+
 Config.EnableNPCWorkers		= false		--NPC Workers are there if player jobs are disabled -- Coming Soon
 Config.EnableNPCOrders		= true		--MUST be false if player jobs are disabled, gives RP NPC orders for players to undertake -- Coming Soon
 
@@ -27,14 +31,14 @@ Config.EnableMoreWorkMorePay	= true	--Each Time you complete a job, if true you 
 --			Blips
 Config.EnableBlips			= true
 --		McDonalds Blip	
-Config.blipLocationM		= vector2(106.7, -1059.5)	--Location
+Config.blipLocationM		= vector2(191.16, -909.8)	--Location
 Config.blipIDM				= 78						--ID
 Config.blipColorM			= 5							--Color
 Config.blipScaleM			= 0.75						--Size
 --	  McDonalds Job Blip	
 Config.EnableJobBlip		= false						--true means show to all players, false only shows to players who have Mcdonalds Job Title and off alltogether if EnableBlips = false.
 
-Config.blipLocationJ		= vector2(138.78, -1060.86)	--Location
+Config.blipLocationJ		= vector2(182.8, -898.49)	--Location
 Config.blipIDJ				= 500						--ID
 Config.blipColorJ			= 69						--Color
 Config.blipScaleJ			= 0.65						--Size
@@ -61,47 +65,53 @@ Config.EnableHighEndDeliveries		= false	--Coming Soon
 
 --	   List of Coords
 
-Config.JobMenuCoords		= vector3(138.78,-1060.86,28)
+Config.JobMenuCoords		= vector3(182.8,-898.49,30.6)
 
-Config.CookBurgerCoords		= vector3(141.26,-1068.62, 28)
-Config.CookFriesCoords		= vector3(136.77,-1073.53, 28)
-Config.CookDrinkCoords		= vector3(138.72,-1073.49, 28)
-Config.CookPrepareCoords	= vector3(139.75,-1067.22, 28)
+Config.CookBurgerCoords		= vector3(177.98,-903.65, 30.6)
+Config.CookFriesCoords		= vector3(176.91,-906.27, 30.6)
+Config.CookDrinkCoords		= vector3(180.33,-904.72, 30.6)
+Config.CookPrepareCoords	= vector3(179.45,-908.39, 30.6)
 
-Config.CashTakeOrder		= vector3(136.01,-1065.33,28.2)
-Config.CashTakeOrder1		= vector3(135.13,-1067.48,28.2)
-Config.CashTakeOrder2		= vector3(134.07,-1069.71,28.2)
-Config.CashTakeOrder3		= vector3(133.24,-1071.73,28.2)
-Config.CashTakeOrder4		= vector3(132.43,-1073.60,28.2)
-Config.CashTakeOrder5		= vector3(133.83,-1074.63,28.2)
-Config.CashCollectMeal		= vector3(137.33,-1066.97,28)
+Config.CashTakeOrder		= vector3(187.84,-904.79,30.6)
+Config.CashTakeOrder1		= vector3(189.41,-905.79,30.6)
+Config.CashTakeOrder2		= vector3(190.71,-905.18,30.6)
+Config.CashCollectMeal		= vector3(180.86,-908.86,30.6) --Cashier and Delivery Meal Pickup Location
 
-Config.DeliveryCarSpawn			= {x = 109.72,y = -1052.64,z = 28.90,h = 247.32}
-Config.DeliveryCarSpawnMarker	= vector3(120.97, -1059.97, 28)
-Config.DeliveryCarDespawn		= vector3(107.93, -1079.89, 28)
+Config.DeliveryCarSpawn			= {x = 156.95,y = -913.35,z = 30.17,h = 69.3}
+Config.DeliveryCarSpawnMarker	= vector3(173.59, -914.2, 29.6)
+Config.DeliveryCarDespawn		= vector3(162.15, -917.79, 29.1)
+
+--MINI ADVANCED MODE
+Config.EnableMealInventory		= true --This means the cook WILL HAVE TO provide meals for the cashier and delivery driver to collect
+Config.MealInventCap			= 0    --0 is unlimited 5 will only allow 5 meals in the inventory COMING SOON
+
+Config.EnableStuckCommand		= true --This will unfreeze the player if they happen to get stuck using /mcstuck
+Config.EnableCookCommand		= false --This will set you as a cook using /mccook
+Config.EnableCashCommand		= false --This will set you as a cashier using /mccash
+Config.EnableDelivCommand		= false --This will set you as a delivery driver using /mcdeliv
 
 Config.minDistance = 1
 --	List of Cashier Deliver Points
 Config.cashDeliveryPoints = {
-	[1] = {x = 132.69, y = -1058.13, z = 28},
-	[2] = {x = 131.21, y = -1062.50, z = 28},
-	[3] = {x = 129.98, y = -1065.05, z = 28},
-	[4] = {x = 127.58, y = -1063.98, z = 28},
-	[5] = {x = 128.85, y = -1061.20, z = 28},
-	[6] = {x = 130.53, y = -1057.27, z = 28},
-	[7] = {x = 127.94, y = -1056.16, z = 28},
-	[8] = {x = 126.35, y = -1060.05, z = 28},
-	[9] = {x = 125.20, y = -1062.77, z = 28},
-	[10] = {x = 122.63, y = -1061.68, z = 28},
-	[11] = {x = 123.58, y = -1059.34, z = 28},
-	[12] = {x = 125.42, y = -1055.17, z = 28},
-	[13] = {x = 123.04, y = -1054.25, z = 28},
-	[14] = {x = 119.25, y = -1065.97, z = 28},
-	[15] = {x = 117.97, y = -1067.99, z = 28},
-	[16] = {x = 122.63, y = -1061.68, z = 28},
-	[17] = {x = 117.21, y = -1070.14, z = 28},
-	[18] = {x = 119.97, y = -1071.37, z = 28},
-	[19] = {x = 120.94, y = -1069.38, z = 28}
+	[1] = {x = 183.75, y = -909.49, z = 30.6},
+	[2] = {x = 182.82, y = -910.63, z = 30.6},
+	[3] = {x = 185.68, y = -911.47, z = 30.6},
+	[4] = {x = 186.80, y = -909.75, z = 30.6},
+	[5] = {x = 193.37, y = -907.86, z = 30.6},
+	[6] = {x = 196.53, y = -906.13, z = 30.6},
+	[7] = {x = 196.18, y = -909.77, z = 30.6},
+	[8] = {x = 199.14, y = -907.94, z = 30.6},
+	[9] = {x = 198.75, y = -911.52, z = 30.6},
+	[10] = {x = 201.77, y = -909.75, z = 30.6},
+	[11] = {x = 197.83, y = -915.44, z = 30.6},
+	[12] = {x = 195.54, y = -913.87, z = 30.6},
+	[13] = {x = 192.69, y = -912.02, z = 30.6},
+	[14] = {x = 191.91, y = -915.76, z = 30.6},
+	[15] = {x = 194.57, y = -917.53, z = 30.6},
+	[16] = {x = 173.99, y = -925.37, z = 30},
+	[17] = {x = 176.57, y = -927.25, z = 30},
+	[18] = {x = 179.03, y = -929.05, z = 30},
+	[19] = {x = 181.57, y = -930.90, z = 30}
 }
 
 --Downtown Delivery Locations
@@ -118,7 +128,7 @@ Config.driveDeliveryPoints = {
 	[10] = {x = 368.55, y = -1896.02, z = 25},
 	[11] = {x = 324.29, y = -1937.81, z = 25},
 	[12] = {x = 295.98, y = -1972.00, z = 23},
-	[13] = {x = 273.37, y = -1997.46, z = 20.2},
+	[13] = {x = 279.37, y = -1993.46, z = 20.2},
 	[14] = {x = 256.55, y = -2023.67, z = 19.20},
 	[15] = {x = 286.91, y = -2034.94, z = 19.77},
 	[16] = {x = 312.62, y = -2053.89, z = 21},
