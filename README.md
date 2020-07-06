@@ -13,10 +13,10 @@ You Can Checkout the Release Post Here:
 [forum.CFX.RE - DGRP_McDonalds](https://forum.cfx.re/t/release-dgrp-mcdonaldsjob-a-fast-food-restaurant-job-for-esx)
 
 ![Logo](https://i.imgur.com/dA1Qe1d.png)
-![Screenshot](https://i.imgur.com/2bmybq8.png)
+![Screenshot](https://i.imgur.com/x95rpFR.png)
 
 ## DISCLAIMER
-If you make changes to the addon please DO NOT re-upoad (and claim as your own work) without my permission. Instead Create a pull request though GitHub and I will add it for everyone to download including credit to your part ofcourse.
+DO NOT re-upoad (and claim as your own work) without my permission. If you make changes Create a pull request though GitHub and I will add it for everyone to download including credit to your part.
 
 ## Requirements
 - [es_extended(v1-final)](https://github.com/ESX-Org/es_extended/tree/v1-final)
@@ -31,7 +31,7 @@ If you make changes to the addon please DO NOT re-upoad (and claim as your own w
 
 ### Using [fvm](https://github.com/qlaffont/fvm-installer)
 ```
-fvm install --save --folder=dgrp FuryFight3r/dgrp_mcdonaldsjob
+fvm install --save --folder=[dgrp] FuryFight3r/dgrp_mcdonaldsjob
 ```
 
 ### Using Git
@@ -46,7 +46,7 @@ git clone https://github.com/FuryFight3r/dgrp_mcdonaldsjob [dgrp]/dgrp_mcdonalds
 
 
 ## Installation
-- Import `dgrp_McDonalds[EN].sql` in your database
+- Import `dgrp_McDonalds[EN].sql` into your database
 - Add this in your server.cfg :
 
 ```
@@ -55,9 +55,7 @@ start dgrp_mcdonaldsjob
 
 ## Credits
 
-- [ribsosay - McDonalds Building](https://www.gta5-mods.com/maps/mcdonalds-building-with-interior-and-drive-through-v-0-01)
-- [Ashton324 - McDonalds Items](https://forum.cfx.re/t/release-esx-mcdonalds-items/1204906)
+- [itsBUCKO - McDonalds Building](https://forum.cfx.re/t/mcdonalds-ymap-remake/1064687)
 - [frank_l59 - NRG Scooter](https://www.gta5-mods.com/vehicles/nrg-mc3)
 - [MOH-samtoxie - Model VW Caddy](https://www.gta5-mods.com/vehicles/addon-volkswagen-caddy-pizza-delivery-danish-dansk)
 - [FuryFight3r - Textures for Vehicles and Scriptwork](https://github.com/FuryFight3r/)
-
