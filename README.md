@@ -15,6 +15,8 @@ You Can Checkout the Release Post Here:
 ![Logo](https://i.imgur.com/dA1Qe1d.png)
 ![Screenshot](https://i.imgur.com/x95rpFR.png)
 
+[Video](https://youtu.be/WecEmBWQ5ug)
+
 ## DISCLAIMER
 DO NOT re-upload (and claim as your own work) without my permission. If you make changes Create a pull request though GitHub and I will add it for everyone to download including credit to your part.
 
