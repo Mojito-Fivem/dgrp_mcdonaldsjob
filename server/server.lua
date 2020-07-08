@@ -7,18 +7,36 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 
 	TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) 
 
+	RegisterServerEvent('dgrp_mcdonalds:setCashierJob')
+		AddEventHandler('dgrp_mcdonalds:setCashierJob', function()
+		local xPlayer = ESX.GetPlayerFromId(source)
+		xPlayer.setJob('McDonalds', 1)
+	end)
+
+	RegisterServerEvent('dgrp_mcdonalds:setCookJob')
+		AddEventHandler('dgrp_mcdonalds:setCookJob', function()
+		local xPlayer = ESX.GetPlayerFromId(source)
+		xPlayer.setJob('McDonalds', 2)
+	end)
+
+	RegisterServerEvent('dgrp_mcdonalds:setDelivJob')
+		AddEventHandler('dgrp_mcdonalds:setDelivJob', function()
+		local xPlayer = ESX.GetPlayerFromId(source)
+		xPlayer.setJob('McDonalds', 3)
+	end)
+
 	RegisterServerEvent('dgrp_mcdonalds:addToMealInvent')
 		AddEventHandler('dgrp_mcdonalds:addToMealInvent', function()
 			currentMeals = currentMeals + 1
 			print("Current Meals are now: "..currentMeals)
-			TriggerClientEvent("dgrp_mcdonalds:setInvent", source, currentMeals)
+			TriggerClientEvent("dgrp_mcdonalds:setInvent", -1, currentMeals)
 	end)
 
 	RegisterServerEvent('dgrp_mcdonalds:removeFromMealInvent')
 		AddEventHandler('dgrp_mcdonalds:removeFromMealInvent', function()
 			currentMeals = currentMeals - 1
 			print("Current Meals are now: "..currentMeals)
-			TriggerClientEvent("dgrp_mcdonalds:setInvent", source, currentMeals)
+			TriggerClientEvent("dgrp_mcdonalds:setInvent", -1, currentMeals)
 	end)
 
 	RegisterServerEvent('dgrp_mcdonalds:getMealAmount')

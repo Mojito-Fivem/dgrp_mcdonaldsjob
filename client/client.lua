@@ -27,6 +27,7 @@ Citizen.CreateThread(function()
 	refreshBlips()
 end)
 
+local hasLoadedCar = true
 local isInMarker = false
 local menuIsOpen = false
 local vehcileMenuIsOpen = false
@@ -77,6 +78,16 @@ local hasStartedBlips = false
 
 local mealInvent = 0
 
+local trayProp
+local bagProp
+local drinkProp
+local currentRegister = 0
+
+local currentPed
+local lastPed
+local delivered = false
+local cobber
+
 --Press [E] Buttons
 Citizen.CreateThread(function()
 	while true do																
@@ -113,17 +124,20 @@ Citizen.CreateThread(function()
                     isInMarker = true
 			    	displayHint = true																
 			    	hintToDisplay = _U('TakeOrder')									
-			    	currentZone = 'cOrder'	
+			    	currentZone = 'cOrder'
+                    currentRegister = 1
                 elseif  playerIsInside(playerCoords, Config.CashTakeOrder1, Config.JobMarkerDistance) and currentJob == 'cashier' and hasTakenOrder == false then 				
                     isInMarker = true
 			    	displayHint = true																
 			    	hintToDisplay = _U('TakeOrder')									
 			    	currentZone = 'cOrder'
+                    currentRegister = 2
                 elseif  playerIsInside(playerCoords, Config.CashTakeOrder2, Config.JobMarkerDistance) and currentJob == 'cashier' and hasTakenOrder == false then 				
                     isInMarker = true
 			    	displayHint = true																
 			    	hintToDisplay = _U('TakeOrder')									
 			    	currentZone = 'cOrder'
+                    currentRegister = 3
 			    elseif  playerIsInside(playerCoords, Config.CashCollectMeal, Config.JobMarkerDistance) and currentJob == 'cashier' and hasOrder == false and hasTakenOrder == true then 				
 			    	isInMarker = true
 			    	displayHint = true																
@@ -149,11 +163,16 @@ Citizen.CreateThread(function()
 			    	displayHint = true																
 			    	hintToDisplay = _U('DelivError')								
 			    	currentZone = 'dDeliver'
-                elseif  playerIsInside(playerCoords, Config.DeliveryCarSpawnMarker, Config.JobMarkerDistance) and currentJob == 'deliv' then 				
+                elseif  playerIsInside(playerCoords, Config.DeliveryCarSpawnMarker, Config.JobMarkerDistance) and currentJob == 'deliv' and hasLoadedCar == true then 				
 			    	isInMarker = true
 			    	displayHint = true																
 			    	hintToDisplay = _U('GetCar')									
 			    	currentZone = 'dCarSpawn'
+                elseif  playerIsInside(playerCoords, Config.DeliveryCarSpawnMarker, Config.JobMarkerDistance) and currentJob == 'deliv' and hasLoadedCar == false then 				
+			    	isInMarker = true
+			    	displayHint = true																
+			    	hintToDisplay = _U('LoadingCar')
+                    currentZone = 'none'
                 elseif  playerIsInside(playerCoords, Config.DeliveryCarDespawn, Config.JobExtendedDistance) and currentJob == 'deliv' and driverHasCar then 				
 			    	isInMarker = true
 			    	displayHint = true																
@@ -164,6 +183,7 @@ Citizen.CreateThread(function()
 			    	displayHint = false
 			    	hintToDisplay = _U('NoHintError')
 			    	currentZone = 'none'
+                    currentRegister = 0
 			    end
 			    if IsControlJustReleased(0, 38) and isInMarker then
 			    	taskTrigger(currentZone)													
@@ -190,33 +210,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
-
-RegisterNetEvent('esx:playerLoaded')
-AddEventHandler('esx:playerLoaded', function(xPlayer)		
-    playerData = xPlayer
-    currentPlayerData = xPlayer
-    if Config == nil then
-        print(Config.Prefix.."Couldnt Load Config")
-    else
-        if Config.EnableBlips == true then
-            while currentPlayerData.job == jobTitle and jBlipsCreated == 0 do
-                refreshBlips()
-                Citizen.Wait(100)
-            end
-        end
-    end								
-end)
-
-RegisterNetEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(job)
-    currentPlayerJobName = job.name
-    if job.name == jobTitle then 
-        onDuty = true
-    else
-        onDuty = false
-    end
-    refreshBlips()						
-end)
 --Hint to Display
 Citizen.CreateThread(function()
     while true do										
@@ -225,6 +218,9 @@ Citizen.CreateThread(function()
             SetTextComponentFormat("STRING")				
             AddTextComponentString(hintToDisplay)			
             DisplayHelpTextFromStringLabel(0, 0, 1, -1)	
+        end
+        if currentPlayerJobName == jobTitle then
+            ShowJob(_U('CRD'), {255,255,255,255},0.755,0.025,0.3,0.3)
         end
     end
 end)
@@ -284,13 +280,8 @@ Citizen.CreateThread(function()
         end
 	end
 end)
-
-function playerIsInside(playerCoords, coords, distance) 	
-	local vecDiffrence = GetDistanceBetweenCoords(playerCoords, coords.x, coords.y, coords.z, false)
-	return vecDiffrence < distance		
-end
 --Zones
-function taskTrigger(zone)				
+function taskTrigger(zone)
 	if zone == 'JobList' then				
 		openMenu()
 	elseif zone == 'Burger' then				
@@ -318,19 +309,84 @@ function taskTrigger(zone)
     end
 end
 
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(xPlayer)		
+    playerData = xPlayer
+    currentPlayerData = xPlayer
+    if Config == nil then
+        print(Config.Prefix.."Couldnt Load Config")
+    else
+        if Config.EnableBlips == true then
+            while currentPlayerData.job == jobTitle and jBlipsCreated == 0 do
+                refreshBlips()
+                Citizen.Wait(100)
+            end
+        end
+    end								
+end)
+
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+    currentPlayerJobName = job.name
+    if job.name == jobTitle then 
+        onDuty = true
+    else
+        onDuty = false
+    end
+    refreshBlips()						
+end)
+
+function setJobName(jobName)
+    if ESX ~= nil then
+        if jobName ~= nil then
+            if jobName == 'cashier' then
+                TriggerServerEvent('dgrp_mcdonalds:setCashierJob')
+            elseif jobName == 'deliv' then
+                TriggerServerEvent('dgrp_mcdonalds:setDelivJob')
+            elseif jobName == 'cook' then
+                TriggerServerEvent('dgrp_mcdonalds:setCookJob')
+            else
+                dPrint("Something went Wrong Setting McDonalds Job")
+            end
+        else
+            dPrint("jobName returned NIL unable to Set McDonalds Job")
+        end
+    else
+        dPrint("ESX is NIL unable to set Job Name")
+    end
+end
+
+function playerIsInside(playerCoords, coords, distance) 	
+	local vecDiffrence = GetDistanceBetweenCoords(playerCoords, coords.x, coords.y, coords.z, false)
+	return vecDiffrence < distance		
+end
+
 function getBurger()
     if invBurger >= 2 then
         exports.pNotify:SendNotification({text = _U('BurgerError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     else
-        --Alerts | alert | notice | info | success | error 
+        local tempWait = Config.CookBurgerTime / 3
         playerIsBusy(true)
+        SetEntityHeading(playerPed, Config.PlrCookBurgerCoords.h)
+        SetEntityCoords(playerPed, Config.PlrCookBurgerCoords.x, Config.PlrCookBurgerCoords.y, Config.PlrCookBurgerCoords.z)
+        local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		local prop = CreateObject(GetHashKey(Config.BurgerNames.a), x, y, z + 0.2, true, true, true)
+		local boneIndex = GetPedBoneIndex(playerPed, 57005)
+		AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
         startAnim("misscarsteal2fixer", "confused_a")
-        exports.pNotify:SendNotification({text = _U('BurgerNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         exports['progressBars']:startUI(Config.CookBurgerTime, _U('BurgerBar'))
-        Citizen.Wait(Config.CookBurgerTime)
+        Citizen.Wait(tempWait)
+        DeleteObject(prop)
+        local prop = CreateObject(GetHashKey(Config.BurgerNames.b), x, y, z + 0.2, true, true, true)
+		AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+        Citizen.Wait(tempWait)
+        DeleteObject(prop)
+        local prop = CreateObject(GetHashKey(Config.BurgerNames.c), x, y, z + 0.2, true, true, true)
+		AttachEntityToEntity(prop, playerPed, boneIndex, 0.12, 0.028, 0.001, 10.0, 175.0, 0.0, true, true, false, true, 1, true)
+        Citizen.Wait(tempWait)
+        DeleteObject(prop)
         ClearPedTasks(PlayerPedId())
         TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_burger')
-        exports.pNotify:SendNotification({text = _U('BurgerNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
         invBurger = invBurger + 1
         playerIsBusy(false)
     end
@@ -341,14 +397,18 @@ function getFries()
         exports.pNotify:SendNotification({text = _U('FriesError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     else
         playerIsBusy(true)
-        --Alerts | alert | notice | info | success | error 
+        SetEntityHeading(playerPed, Config.PlrCookFriesCoords.h)
+        SetEntityCoords(playerPed, Config.PlrCookFriesCoords.x, Config.PlrCookFriesCoords.y, Config.PlrCookFriesCoords.z)
         startAnim("mp_common", "givetake1_a")
-        exports.pNotify:SendNotification({text = _U('FriesNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         exports['progressBars']:startUI(Config.CookFriesTime, _('FriesBar'))
+        local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		local prop = CreateObject(GetHashKey(Config.FriesName), x, y, z + 0.2, true, true, true)
+		local boneIndex = GetPedBoneIndex(playerPed, 57005)
+		AttachEntityToEntity(prop, playerPed, boneIndex, -0.1, 0, -0.05, 0, 0, 0, true, true, false, true, 1, false)
         Citizen.Wait(Config.CookFriesTime)
+        DeleteObject(prop)
         ClearPedTasks(PlayerPedId())
         TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_fries')
-        exports.pNotify:SendNotification({text = _U('FriesNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
         invFries = invFries + 1
         playerIsBusy(false)
     end
@@ -359,14 +419,18 @@ function getDrink()
         exports.pNotify:SendNotification({text = _U('DrinkError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     else
         playerIsBusy(true)
-        --Alerts | alert | notice | info | success | error 
+        SetEntityHeading(playerPed, Config.PlrCookDrinkCoords.h)
+        SetEntityCoords(playerPed, Config.PlrCookDrinkCoords.x, Config.PlrCookDrinkCoords.y, Config.PlrCookDrinkCoords.z)
         startAnim("mp_common", "givetake1_a")
-        exports.pNotify:SendNotification({text = _U('DrinkNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         exports['progressBars']:startUI(Config.CookDrinkTime, _U('DrinkBar'))
+        local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		local prop = CreateObject(GetHashKey(Config.DrinkName), x, y, z + 0.2, true, true, true)
+		local boneIndex = GetPedBoneIndex(playerPed, 28422)
+		AttachEntityToEntity(prop, playerPed, boneIndex, 0, 0, -0.085, 10.0, 90, 0.0, true, true, false, false, 0, false)
         Citizen.Wait(Config.CookDrinkTime)
+        DeleteObject(prop)
         ClearPedTasks(PlayerPedId())
         TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_drink')
-        exports.pNotify:SendNotification({text = _U('DrinkNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
         invDrink = invDrink + 1
         playerIsBusy(false)
     end
@@ -380,18 +444,29 @@ end)
 function prepareMeal()
     if Config.EnableMealInventory == true then
         if invBurger > 0 and invDrink > 0 and invFries > 0 then
-            --Alerts | alert | notice | info | success | error 
             playerIsBusy(true)
+            SetEntityHeading(playerPed, Config.PlrCookPrepCoords.h)
+            SetEntityCoords(playerPed, Config.PlrCookPrepCoords.x, Config.PlrCookPrepCoords.y, Config.PlrCookPrepCoords.z)
+            local tempWait = Config.CookPrepareTime / 4
             startAnim("misscarsteal2fixer", "confused_a")
-            exports.pNotify:SendNotification({text = _U('MealNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports['progressBars']:startUI(Config.CookPrepareTime, _U('MealBar'))
-            Citizen.Wait(Config.CookPrepareTime)
+			local trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayPosition.x, Config.TrayPosition.y, Config.TrayPosition.z, true, true, true)
+            Citizen.Wait(tempWait)
+            local friesProp = CreateObject(GetHashKey(Config.FriesName), Config.BagPosition.x - 0.1, Config.BagPosition.y - 0.1, Config.BagPosition.z, true, true, true)
+            Citizen.Wait(tempWait)
+            local bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagPosition.x, Config.BagPosition.y, Config.BagPosition.z, true, true, true) 
+            Citizen.Wait(tempWait)
+            local drinkProp = CreateObject(GetHashKey(Config.DrinkName), Config.DrinkPosition.x, Config.DrinkPosition.y, Config.DrinkPosition.z, true, true, true) 
+            Citizen.Wait(tempWait)
             ClearPedTasks(PlayerPedId())
-            exports.pNotify:SendNotification({text = _U('MealNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
             invBurger = invBurger - 1
             invDrink = invDrink - 1
             invFries = invFries - 1
             mealsMade = mealsMade + 1
+            DeleteObject(trayProp)
+            DeleteObject(friesProp)
+            DeleteObject(bagProp)
+            DeleteObject(drinkProp)
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
@@ -408,25 +483,45 @@ function prepareMeal()
                 TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
                 ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
             end
+            trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayDonePosition.x, Config.TrayDonePosition.y, Config.TrayDonePosition.z, true, true, true)
+            bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
+            friesProp = CreateObject(GetHashKey(Config.FriesName), Config.BagDonePosition.x - 0.1, Config.BagDonePosition.y - 0.1, Config.BagDonePosition.z, true, true, true)
+            drinkProp = CreateObject(GetHashKey(Config.DrinkName), Config.DrinkDonePosition.x, Config.DrinkDonePosition.y, Config.DrinkDonePosition.z, true, true, true)
             playerIsBusy(false)
+            Citizen.Wait(5000)
+            DeleteObject(trayProp)
+            DeleteObject(friesProp)
+            DeleteObject(bagProp)
+            DeleteObject(drinkProp)
         else
             exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         end
     else
         if invBurger > 0 and invDrink > 0 and invFries > 0 then
-            --Alerts | alert | notice | info | success | error 
             playerIsBusy(true)
+            local tempWait = Config.CookPrepareTime / 4
+            SetEntityHeading(playerPed, Config.PlrCookPrepCoords.h)
+            SetEntityCoords(playerPed, Config.PlrCookPrepCoords.x, Config.PlrCookPrepCoords.y, Config.PlrCookPrepCoords.z)
             startAnim("misscarsteal2fixer", "confused_a")
-            exports.pNotify:SendNotification({text = _U('MealNotifStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports['progressBars']:startUI(Config.CookPrepareTime, _U('MealBar'))
-            Citizen.Wait(Config.CookPrepareTime)
+            local trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayPosition.x, Config.TrayPosition.y, Config.TrayPosition.z, true, true, true)
+            Citizen.Wait(tempWait)
+            local friesProp = CreateObject(GetHashKey(Config.FriesName), Config.BagPosition.x - 0.1, Config.BagPosition.y - 0.1, Config.BagPosition.z, true, true, true)
+            Citizen.Wait(tempWait)
+            local bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagPosition.x, Config.BagPosition.y, Config.BagPosition.z, true, true, true) 
+            Citizen.Wait(tempWait)
+            local drinkProp = CreateObject(GetHashKey(Config.DrinkName), Config.DrinkPosition.x, Config.DrinkPosition.y, Config.DrinkPosition.z, true, true, true) 
+            Citizen.Wait(tempWait)
             ClearPedTasks(PlayerPedId())
-            exports.pNotify:SendNotification({text = _U('MealNotifFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
             invBurger = invBurger - 1
             invDrink = invDrink - 1
             invFries = invFries - 1
             mealsMade = mealsMade + 1
+            DeleteObject(trayProp)
+            DeleteObject(friesProp)
+            DeleteObject(bagProp)
+            DeleteObject(drinkProp)
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
@@ -442,7 +537,16 @@ function prepareMeal()
                 TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
                 ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
             end
+            trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayDonePosition.x, Config.TrayDonePosition.y, Config.TrayDonePosition.z, true, true, true)
+            bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
+            friesProp = CreateObject(GetHashKey(Config.FriesName), Config.BagDonePosition.x - 0.1, Config.BagDonePosition.y - 0.1, Config.BagDonePosition.z, true, true, true)
+            drinkProp = CreateObject(GetHashKey(Config.DrinkName), Config.DrinkDonePosition.x, Config.DrinkDonePosition.y, Config.DrinkDonePosition.z, true, true, true)
             playerIsBusy(false)
+            Citizen.Wait(2000)
+            DeleteObject(trayProp)
+            DeleteObject(friesProp)
+            DeleteObject(bagProp)
+            DeleteObject(drinkProp)
         else
             exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
@@ -452,18 +556,40 @@ end
 
 function takeOrder()
     if hasTakenOrder == false then
-        --Alerts | alert | notice | info | success | error 
         playerIsBusy(true)
-        exports.pNotify:SendNotification({text = _U('CashStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if currentRegister == 1 then
+            SetEntityHeading(playerPed, Config.PlrCashTOCoords.h)
+            SetEntityCoords(playerPed, Config.PlrCashTOCoords.x, Config.PlrCashTOCoords.y, Config.PlrCashTOCoords.z)
+        elseif currentRegister == 2 then
+            SetEntityHeading(playerPed, Config.PlrCashTO1Coords.h)
+            SetEntityCoords(playerPed, Config.PlrCashTO1Coords.x, Config.PlrCashTO1Coords.y, Config.PlrCashTO1Coords.z)
+        elseif currentRegister == 3 then
+            SetEntityHeading(playerPed, Config.PlrCashTO2Coords.h)
+            SetEntityCoords(playerPed, Config.PlrCashTO2Coords.x, Config.PlrCashTO2Coords.y, Config.PlrCashTO2Coords.z)
+        else
+            dPrint("The Current Register Number Could NOT be Determined! Unable to set Player Position and Heading")
+        end
+        
         exports['progressBars']:startUI(Config.CashOrderTime, _U('CashBar'))
-        startAnim("mp_common", "givetake1_a")
-        local tempTime = Config.CashOrderTime / 2
-        Citizen.Wait(tempTime)
-        ClearPedTasks(PlayerPedId())
         startAnim("mp_take_money_mg", "stand_cash_in_bag_loop")
+        local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		local prop = CreateObject(GetHashKey(Config.CashName), x, y, z - 0.5, true, true, true)
+		local boneIndex = GetPedBoneIndex(playerPed, 28422)
+		AttachEntityToEntity(prop, playerPed, boneIndex, 0.075, 0, -0.02, 90, 90, 90, true, true, false, false, 0, true)
+        local tempTime = Config.CashOrderTime / 4
+        Citizen.Wait(tempTime)
+        DeleteObject(prop)
         Citizen.Wait(tempTime)
         ClearPedTasks(PlayerPedId())
-        exports.pNotify:SendNotification({text = _U('CashFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})        
+        startAnim("mp_common", "givetake1_a")
+        local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		local prop1 = CreateObject(GetHashKey(Config.Cash1Name), x, y, z - 0.5, true, true, true)
+		local boneIndex = GetPedBoneIndex(playerPed, 28422)
+		AttachEntityToEntity(prop1, playerPed, boneIndex, 0, 0, 0.01, 90, 90, 90, true, true, false, false, 0, true)
+        Citizen.Wait(tempTime)
+        DeleteObject(prop1)
+        Citizen.Wait(tempTime)
+        ClearPedTasks(PlayerPedId())
         hasTakenOrder = true
         playerIsBusy(false)
     else
@@ -475,23 +601,43 @@ function pickupOrder()
     if Config.EnableMealInventory == true then
         if hasOrder == false and hasTakenOrder == true then
             if mealInvent > 0 then
-                TriggerServerEvent("dgrp_mcdonalds:removeFromMealInvent")
                 playerIsBusy(true)
-                exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                SetEntityHeading(playerPed, Config.PlrCashCollectCoords.h)
+                SetEntityCoords(playerPed, Config.PlrCashCollectCoords.x, Config.PlrCashCollectCoords.y, Config.PlrCashCollectCoords.z)
+                trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayDonePosition.x, Config.TrayDonePosition.y, Config.TrayDonePosition.z, true, true, true)
+                bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
+                friesProp = CreateObject(GetHashKey(Config.FriesName), Config.BagDonePosition.x - 0.1, Config.BagDonePosition.y - 0.1, Config.BagDonePosition.z, true, true, true)
+                drinkProp = CreateObject(GetHashKey(Config.DrinkName), Config.DrinkDonePosition.x, Config.DrinkDonePosition.y, Config.DrinkDonePosition.z, true, true, true)
+                local tempTime = Config.CashMealTime / 5
+                TriggerServerEvent("dgrp_mcdonalds:removeFromMealInvent")
                 exports['progressBars']:startUI(Config.CashMealTime, _U('PickupBar'))
                 startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
-                Citizen.Wait(4000)
+                local x,y,z = table.unpack(GetEntityCoords(playerPed))
+		        local bagProp1 = CreateObject(GetHashKey(Config.MealName), x, y, z - 0.5, true, true, true)
+		        local boneIndex = GetPedBoneIndex(playerPed, 18902)
+		        AttachEntityToEntity(bagProp1, playerPed, boneIndex, 0, 0, 0.01, 90, 90, 90, true, true, false, false, 0, true)
+                Citizen.Wait(tempTime)
+                DeleteObject(bagProp1)
+                local bagProp2 = CreateObject(GetHashKey(Config.MealName), 181.156, -909.805, 31.602, true, true, true)
+                Citizen.Wait(tempTime)
                 ClearPedTasks(PlayerPedId())
                 startAnim("misscarsteal2fixer", "confused_a")
-                Citizen.Wait(Config.CashMealTime - 4000)
-                ClearPedTasks(PlayerPedId())
+                Citizen.Wait(tempTime)
+                DeleteObject(friesProp)
+                DeleteObject(bagProp)
+                Citizen.Wait(tempTime)
+                DeleteObject(bagProp2)
+                local bagProp3 = CreateObject(GetHashKey(Config.MealName), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
+                Citizen.Wait(tempTime)
                 ClearPedTasks(PlayerPedId())
                 TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-                exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
                 invMeal = invMeal + 1
                 hasOrder = true
-                setDelivery()
                 playerIsBusy(false)
+                DeleteObject(trayProp)
+                DeleteObject(bagProp3)
+                DeleteObject(drinkProp)
+                setDelivery()
             else
                 exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             end
@@ -505,7 +651,6 @@ function pickupOrder()
     else
         if hasOrder == false and hasTakenOrder == true then
             playerIsBusy(true)
-            exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports['progressBars']:startUI(Config.CashMealTime, _U('PickupBar'))
             startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
             Citizen.Wait(4000)
@@ -515,7 +660,6 @@ function pickupOrder()
             ClearPedTasks(PlayerPedId())
             ClearPedTasks(PlayerPedId())
             TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-            exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
             invMeal = invMeal + 1
             hasOrder = true
             setDelivery()
@@ -532,20 +676,50 @@ end
 
 function setDelivery()
     repeat
-    deliveryPoint = math.random(1, #Config.cashDeliveryPoints)
+        deliveryPoint = math.random(1, #Config.cashDeliveryPoints)
 	until deliveryPoint ~= lastDelivery
-	deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
-  	taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
-	lastDelivery = deliveryPoint
-    isDelivering = true
-    setGPS(deliveryCoords)
-    exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    if Config.EnableNPCOrders == true then
+        deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
+  	    taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
+	    lastDelivery = deliveryPoint
+        isDelivering = true
+        setGPS(deliveryCoords)
+        exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        spawnPed()
+    else
+        deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
+  	    taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
+	    lastDelivery = deliveryPoint
+        isDelivering = true
+        setGPS(deliveryCoords)
+        exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    end
+end
+
+function spawnPed()
+    repeat
+        currentPed = math.random(1, #Config.NPCNames)
+    until currentPed ~= lastPed
+    dPrint("Ped Name: "..Config.NPCNames[currentPed].name)
+    RequestModel(Config.NPCNames[currentPed].name)
+    while not HasModelLoaded(Config.NPCNames[currentPed].name) do
+        Wait(1)
+    end
+    deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
+    cobber = CreatePed(1, Config.NPCNames[currentPed].name, deliveryCoords.x - 0.6, deliveryCoords.y - 0.1, deliveryCoords.z + 0.1, 237.39, false, true)
+    SetBlockingOfNonTemporaryEvents(cobber, true)
+    SetPedDiesWhenInjured(cobber, false)
+    SetPedCanPlayAmbientAnims(cobber, false)
+    SetPedCanRagdollFromPlayerImpact(cobber, false)
+    SetEntityInvincible(cobber, true)
+    FreezeEntityPosition(cobber, true)
+    TaskStartScenarioInPlace(cobber, "amb@code_human_in_bus_passenger_idles@female@sit@base", 0, true);
+    delivered = false
 end
 
 function deliverOrder()
     playerIsBusy(true)
     local tempTime = Config.CashDelivTime / 2
-    exports.pNotify:SendNotification({text = _U('GiveStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     exports['progressBars']:startUI(Config.CashDelivTime, _U('GiveBar'))
     startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
     Citizen.Wait(tempTime)
@@ -553,10 +727,11 @@ function deliverOrder()
     startAnim("mp_common", "givetake1_a")
     Citizen.Wait(tempTime)
     ClearPedTasks(PlayerPedId())
-    exports.pNotify:SendNotification({text = _U('GiveFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
     customersServed = customersServed + 1
     RemoveBlip(Blips['deliver'])
+    delivered = true
     TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_meal')
+    DeleteObject(cobber)
     if Config.EnableMoreWorkMorePay == true then
         bonus = 1 * customersServed
         payBonus = Config.CashJobPay * bonus
@@ -583,12 +758,10 @@ function pickupDelivery()
                 TriggerServerEvent("dgrp_mcdonalds:removeFromMealInvent")
                 playerIsBusy(true)
                 startAnim("misscarsteal2fixer", "confused_a")
-                exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
                 exports['progressBars']:startUI(Config.CashMealTime, "Collecting McDonalds Order")
                 Citizen.Wait(Config.CashMealTime)
                 ClearPedTasks(PlayerPedId())
                 TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-                exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
                 invMeal = invMeal + 1
                 dHasOrder = true
                 setDriveDelivery()
@@ -605,12 +778,10 @@ function pickupDelivery()
         if dHasOrder == false then
             playerIsBusy(true)
             startAnim("misscarsteal2fixer", "confused_a")
-            exports.pNotify:SendNotification({text = _U('PickupStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             exports['progressBars']:startUI(Config.CashMealTime, "Collecting McDonalds Order")
             Citizen.Wait(Config.CashMealTime)
             ClearPedTasks(PlayerPedId())
             TriggerServerEvent("dgrp_mcdonalds:addItem", 'mcdonalds_meal')
-            exports.pNotify:SendNotification({text = _U('PickupFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
             invMeal = invMeal + 1
             dHasOrder = true
             setDriveDelivery()
@@ -708,6 +879,13 @@ function openVehicleMenu()
     end)
 end
 
+function loadCarEvent()
+    isInMarker = false
+	displayHint = false
+	hintToDisplay = _U('NoHintError')
+	currentZone = 'none'
+end
+
 function spawnVehicle(carToSpawn, depositAmount)
     if Config.PayDeposit == true then
         TriggerServerEvent("dgrp_mcdonalds:payDeposit", depositAmount)
@@ -716,7 +894,10 @@ function spawnVehicle(carToSpawn, depositAmount)
 	RequestModel(vehicleModel)				
 	while not HasModelLoaded(vehicleModel) do	
 		Citizen.Wait(0)
+        hasLoadedCar = false
 	end
+    hasLoadedCar = true
+    loadCarEvent()
 	currentCar = CreateVehicle(vehicleModel, Config.DeliveryCarSpawn.x, Config.DeliveryCarSpawn.y, Config.DeliveryCarSpawn.z, Config.DeliveryCarSpawn.h, true, false)
 	SetVehicleHasBeenOwnedByPlayer(currentCar,  true)														
 	SetEntityAsMissionEntity(currentCar,  true,  true)														
@@ -765,13 +946,11 @@ end
 
 function driveFromDelivery()
  startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
-    exports.pNotify:SendNotification({text = _U('GiveStart'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     exports['progressBars']:startUI(Config.CashDelivTime, _U('GiveBar'))
     FreezeEntityPosition(playerPed, true)
     Citizen.Wait(Config.CashDelivTime)
     FreezeEntityPosition(playerPed, false)
-    ClearPedTasks(PlayerPedId())
-    exports.pNotify:SendNotification({text = _U('GiveFinish'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})    
+    ClearPedTasks(PlayerPedId())    
     ordersDelivered = ordersDelivered + 1
     RemoveBlip(Blips['deliver'])
     TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_meal')
@@ -905,7 +1084,7 @@ function openMenu()
                 exports.pNotify:SendNotification({text = _U('CashierError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             else
                 currentJob = 'cashier'
-                --Change Job Grade Here
+                setJobName(currentJob)
                 exports.pNotify:SendNotification({text = _U('CashierSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
                 onDuty = true
                 isDelivering = false
@@ -922,7 +1101,7 @@ function openMenu()
                 exports.pNotify:SendNotification({text = _U('CookError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             else
                 currentJob = 'cook'
-                --Change Job Grade Here
+                setJobName(currentJob)
                 exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
                 onDuty = true
                 isDelivering = false
@@ -939,7 +1118,7 @@ function openMenu()
                 exports.pNotify:SendNotification({text = _U('DriverError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
             else
                 currentJob = 'deliv'
-                --Change Job Grade Here
+                setJobName(currentJob)
                 exports.pNotify:SendNotification({text = _U('DriverSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
                 onDuty = true
                 isDelivering = false
@@ -967,7 +1146,7 @@ function startAnim(lib, anim)
 		TaskPlayAnim(PlayerPedId(), lib, anim, 8.0, -8.0, -1, 0, 0.0, false, false, false)
 	end)
 end
-
+--Commands
 Citizen.CreateThread(function()
     if Config.EnableStuckCommand == true then
         RegisterCommand("mcstuck", function()
@@ -978,7 +1157,7 @@ Citizen.CreateThread(function()
     if Config.EnableCookCommand == true then
         RegisterCommand("mccook", function()
             currentJob = 'cook'
-            --Change Job Grade Here
+            setJobName(currentJob)
             exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
@@ -994,8 +1173,8 @@ Citizen.CreateThread(function()
     if Config.EnableCashCommand == true then
         RegisterCommand("mccash", function()
             currentJob = 'cashier'
-            --Change Job Grade Here
-            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+            setJobName(currentJob)
+            exports.pNotify:SendNotification({text = _U('CashierSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
             invMeal = 0
@@ -1010,8 +1189,8 @@ Citizen.CreateThread(function()
     if Config.EnableDelivCommand == true then
         RegisterCommand("mcdeliv", function()
             currentJob = 'deliv'
-            --Change Job Grade Here
-            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+            setJobName(currentJob)
+            exports.pNotify:SendNotification({text = _U('DriverSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
             invMeal = 0
@@ -1022,24 +1201,36 @@ Citizen.CreateThread(function()
             hasTakenOrder = false
         end)
     end
-
 end)
 
---Testing Commands
+function ShowJob(text,colour,coordsx,coordsy,scalex,scaley)
+	SetTextFont(7)
+	SetTextProportional(7)
+	SetTextScale(scalex, scaley)
+	local colourr,colourg,colourb,coloura = table.unpack(colour)
+	SetTextColour(colourr,colourg,colourb, coloura)
+	SetTextDropshadow(0, 0, 0, 0, coloura)
+	SetTextEdge(1, 0, 0, 0, coloura)
+	SetTextDropShadow()
+	SetTextOutline()
+	SetTextEntry("STRING")
+	AddTextComponentString(text)
+	EndTextCommandDisplayText(coordsx,coordsy)
+end
+	--Testing Commands
+	RegisterCommand("addMeal", function()
+		Citizen.CreateThread(function()
+			TriggerServerEvent("dgrp_mcdonalds:addToMealInvent")
+			TriggerEvent("chat:addMessage", {args={Config.Prefix.."Adding Meal to Kitchen Invetory"}}) 
+		end)
+	end)
 
 RegisterCommand("order", function()
-    Citizen.CreateThread(function()
-        takeOrder()
-        TriggerEvent("chat:addMessage", {args={Config.Prefix.."Ordering Meal"}}) 
-    end)
-end)
-
-RegisterCommand("addMeal", function()
-    Citizen.CreateThread(function()
-        TriggerServerEvent("dgrp_mcdonalds:addToMealInvent")
-        TriggerEvent("chat:addMessage", {args={Config.Prefix.."Adding Meal to Kitchen Invetory"}}) 
-    end)
-end)
+		Citizen.CreateThread(function()
+			takeOrder()
+			TriggerEvent(source, "chat:addMessage", {args={Config.Prefix.."Ordering Meal"}})
+		end)
+	end)
 
 function dPrint(msg)
     print(""..Config.Prefix..""..msg..".")

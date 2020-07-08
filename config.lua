@@ -9,12 +9,29 @@ Config.EnablePlayerCook		= true		--Cook gets drinks, makes burgers and fries and
 Config.EnablePlayerClerk	= true		--Clerk receives orders, gives to cook, receives orders from cook, and gives to customer. 				
 Config.EnablePlayerDriver	= true		--Driver delivers orders marked for delivery.
 
-Config.CashJobLimit			= 3			--The amount of staff that can be in a job at a time COMING SOON
+Config.CashJobLimit			= 3			--The amount of staff that can be in a job at a time
 Config.CookJobLimit			= 3			--			    "                "
 Config.DelivJobLimit		= 7			--			    "                "
 
 Config.EnableNPCWorkers		= false		--NPC Workers are there if player jobs are disabled -- Coming Soon
 Config.EnableNPCOrders		= true		--MUST be false if player jobs are disabled, gives RP NPC orders for players to undertake -- Coming Soon
+
+Config.NPCDespawnTime		= 5			--Minutes until NPC gets deleted // DOESNT WORK! NEEDS FIXING
+
+Config.NPCNames	= {
+	--Female Peds
+	[1] = {name = 'a_f_o_salton_01'},
+	[2] = {name = 'a_f_y_eastsa_03'},
+	[3] = {name = 'a_f_y_tourist_02'},
+	[4] = {name = 'a_f_y_bevhills_02'},
+	[5] = {name = 'a_f_m_soucentmc_01'},
+	--Male Peds
+	[6] = {name = 'a_m_m_bevhills_01'},
+	[7] = {name = 'a_m_m_afriamer_01'},
+	[8] = {name = 'a_m_m_genfat_01'},
+	[9] = {name = 'a_m_m_hillbilly_01'},
+	[10] = {name = 'a_m_m_trampbeac_01'}
+}
 
 Config.CookJobPay			= 50		--The amount the cook is paid per meal made.
 Config.CashJobPay			= 40		--The amount the cashier is paid per meal delivered to table.
@@ -67,15 +84,23 @@ Config.EnableHighEndDeliveries		= false	--Coming Soon
 
 Config.JobMenuCoords		= vector3(182.8,-898.49,30.6)
 
-Config.CookBurgerCoords		= vector3(177.98,-903.65, 30.6)
+Config.CookBurgerCoords		= vector3(178.00,-903.72, 30.6)
+Config.PlrCookBurgerCoords	= {x = 178.00, y = -903.72, z = 30.81, h = 73.16}
 Config.CookFriesCoords		= vector3(176.91,-906.27, 30.6)
-Config.CookDrinkCoords		= vector3(180.33,-904.72, 30.6)
-Config.CookPrepareCoords	= vector3(179.45,-908.39, 30.6)
+Config.PlrCookFriesCoords	= {x = 177.02, y = -906.28, z = 30.81, h = 75.59}
+Config.CookDrinkCoords		= vector3(181.33,-905.30, 30.6)
+Config.PlrCookDrinkCoords	= {x = 181.33, y = -905.30, z = 30.81, h = 327.8}
+Config.CookPrepareCoords	= vector3(179.15,-907.82, 30.6)
+Config.PlrCookPrepCoords	= {x = 179.15, y = -907.82, z = 30.81, h = 161.1}
 
-Config.CashTakeOrder		= vector3(187.84,-904.79,30.6)
-Config.CashTakeOrder1		= vector3(189.41,-905.79,30.6)
-Config.CashTakeOrder2		= vector3(190.71,-905.18,30.6)
+Config.CashTakeOrder		= vector3(187.96,-904.47,30.6)
+Config.PlrCashTOCoords		= {x = 187.96, y = -904.47, z = 30.81, h = 146.41}
+Config.CashTakeOrder1		= vector3(189.43,-905.40,30.6)
+Config.PlrCashTO1Coords		= {x = 189.43, y = -905.40, z = 30.81, h = 164.97}
+Config.CashTakeOrder2		= vector3(190.47,-905.03,30.6)
+Config.PlrCashTO2Coords		= {x = 190.47, y = -905.03, z = 30.81, h = 228.16}
 Config.CashCollectMeal		= vector3(180.86,-908.86,30.6) --Cashier and Delivery Meal Pickup Location
+Config.PlrCashCollectCoords	= {x = 181.09, y = -908.44, z = 30.81, h = 158.56}
 
 Config.DeliveryCarSpawn			= {x = 156.95,y = -913.35,z = 30.17,h = 69.3}
 Config.DeliveryCarSpawnMarker	= vector3(173.59, -914.2, 29.6)
@@ -83,12 +108,29 @@ Config.DeliveryCarDespawn		= vector3(162.15, -917.79, 29.1)
 
 --MINI ADVANCED MODE
 Config.EnableMealInventory		= true --This means the cook WILL HAVE TO provide meals for the cashier and delivery driver to collect
-Config.MealInventCap			= 0    --0 is unlimited 5 will only allow 5 meals in the inventory COMING SOON
+Config.MealInventCap			= 0    --0 is unlimited 5 will only allow 5 meals in the inventory
 
 Config.EnableStuckCommand		= true --This will unfreeze the player if they happen to get stuck using /mcstuck
-Config.EnableCookCommand		= false --This will set you as a cook using /mccook
-Config.EnableCashCommand		= false --This will set you as a cashier using /mccash
-Config.EnableDelivCommand		= false --This will set you as a delivery driver using /mcdeliv
+Config.EnableCookCommand		= true --This will set you as a cook using /mccook
+Config.EnableCashCommand		= true --This will set you as a cashier using /mccash
+Config.EnableDelivCommand		= true --This will set you as a delivery driver using /mcdeliv
+
+Config.TrayName			= 'prop_food_bs_tray_01'
+Config.MealName			= 'ng_proc_food_bag01a'
+Config.DrinkName		= 'prop_food_bs_juice01'
+Config.CashTrayName		= 'prop_food_bs_tray_02'
+Config.CashName			= 'prop_cash_pile_02'
+Config.Cash1Name		= 'prop_cash_note_01'
+
+Config.BurgerNames		= {a = 'prop_cs_burger_01', b = 'prop_food_bs_burg1', c = 'prop_food_bs_burg3'}
+Config.FriesName		= 'prop_food_bs_chips'
+
+Config.TrayPosition			= {x = 178.833, y = -909.116, z = 31.597}
+Config.TrayDonePosition		= {x = 180.715, y = -909.724, z = 31.597}
+Config.BagPosition			= {x = 178.928, y = -909.147, z = 31.596}
+Config.BagDonePosition		= {x = 180.810, y = -909.754, z = 31.596}
+Config.DrinkPosition		= {x = 178.728, y = -909.031, z = 31.602}
+Config.DrinkDonePosition	= {x = 180.609, y = -909.639, z = 31.602}
 
 Config.minDistance = 1
 --	List of Cashier Deliver Points
@@ -108,10 +150,10 @@ Config.cashDeliveryPoints = {
 	[13] = {x = 192.69, y = -912.02, z = 30.6},
 	[14] = {x = 191.91, y = -915.76, z = 30.6},
 	[15] = {x = 194.57, y = -917.53, z = 30.6},
-	[16] = {x = 173.99, y = -925.37, z = 30},
-	[17] = {x = 176.57, y = -927.25, z = 30},
-	[18] = {x = 179.03, y = -929.05, z = 30},
-	[19] = {x = 181.57, y = -930.90, z = 30}
+	[16] = {x = 173.99, y = -925.37, z = 29.7},
+	[17] = {x = 176.57, y = -927.25, z = 29.7},
+	[18] = {x = 179.03, y = -929.05, z = 29.7},
+	[19] = {x = 181.57, y = -930.90, z = 29.7}
 }
 
 --Downtown Delivery Locations
@@ -120,7 +162,7 @@ Config.driveDeliveryPoints = {
 	[2] = {x = 299.79, y = -1784.21, z = 28},
 	[3] = {x = 304.44, y = -1775.45, z = 29},
 	[4] = {x = 332.85, y = -1741.05, z = 28},
-	[5] = {x = 405.67, y = -1751.25, z = 28},
+	[5] = {x = 405.67, y = -1751.25, z = 28.71},
 	[6] = {x = 431.22, y = -1725.63, z = 28},
 	[7] = {x = 443.23, y = -1707.17, z = 28.1},
 	[8] = {x = 412.74, y = -1855.71, z = 27.5},
