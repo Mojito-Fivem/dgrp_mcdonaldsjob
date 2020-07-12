@@ -2,9 +2,11 @@ fx_version 'adamant'
 
 game 'gta5'
 
+author 'DefectGamings FuryFight3r'
+
 description 'DGRP McDonalds Job'
 
-version '1.1'
+version '2.6'
 
 server_scripts {
 	'@es_extended/locale.lua',
