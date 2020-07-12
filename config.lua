@@ -9,14 +9,11 @@ Config.EnablePlayerCook		= true		--Cook gets drinks, makes burgers and fries and
 Config.EnablePlayerClerk	= true		--Clerk receives orders, gives to cook, receives orders from cook, and gives to customer. 				
 Config.EnablePlayerDriver	= true		--Driver delivers orders marked for delivery.
 
-Config.CashJobLimit			= 3			--The amount of staff that can be in a job at a time
-Config.CookJobLimit			= 3			--			    "                "
-Config.DelivJobLimit		= 7			--			    "                "
+Config.EnableNPCOrders		= true		--If False only players can RP Orders and Pay with F6 billing, if true gives RP NPC orders for cashiers and delivery drivers to undertake
 
-Config.EnableNPCWorkers		= false		--NPC Workers are there if player jobs are disabled -- Coming Soon
-Config.EnableNPCOrders		= true		--MUST be false if player jobs are disabled, gives RP NPC orders for players to undertake -- Coming Soon
+Config.SpawnPeds			= true		--This Spawns Peds at the tables for the cashier to give the order to (only aesthetics)
 
-Config.NPCDespawnTime		= 5			--Minutes until NPC gets deleted // DOESNT WORK! NEEDS FIXING
+Config.NPCDespawnTime		= 3			--Seconds until NPC gets deleted **DONT MAKE IT TO LONG AS IT HANGS THE CASHIER AND WONT LET THEM DO ANYTHING**
 
 Config.NPCNames	= {
 	--Female Peds
@@ -64,7 +61,7 @@ Config.JobMarkerColor			= {r = 112, g = 255, b = 237, a = 75}	--Job Marker Color
 Config.DeliveryMarkerColor		= {r = 120, g = 255, b = 142, a = 75}	--Marker Color Default Green
 Config.CarDespawnMarkerColor	= {r = 255, g = 50, b = 50, a = 75}
 Config.JobMarkerDistance		= 0.75									--The distance from the center of the marker to enable menu/text
-Config.JobExtendedDistance		= 2.5
+Config.JobExtendedDistance		= 2.25
 --		Cook Times
 Config.CookDrinkTime		= 4 * 1000		--The time that it takes to make a drink.
 Config.CookFriesTime		= 4 * 1000		--The time that it takes to make fries.
@@ -84,8 +81,8 @@ Config.EnableHighEndDeliveries		= false	--Coming Soon
 
 Config.JobMenuCoords		= vector3(182.8,-898.49,30.6)
 
-Config.CookBurgerCoords		= vector3(178.00,-903.72, 30.6)
-Config.PlrCookBurgerCoords	= {x = 178.00, y = -903.72, z = 30.81, h = 73.16}
+Config.CookBurgerCoords		= vector3(178.00,-903.72, 30.6) -- Position that the Marker is Displayed
+Config.PlrCookBurgerCoords	= {x = 178.00, y = -903.72, z = 30.81, h = 73.16} -- Position that the player gets moved to
 Config.CookFriesCoords		= vector3(176.91,-906.27, 30.6)
 Config.PlrCookFriesCoords	= {x = 177.02, y = -906.28, z = 30.81, h = 75.59}
 Config.CookDrinkCoords		= vector3(181.33,-905.30, 30.6)
@@ -108,7 +105,6 @@ Config.DeliveryCarDespawn		= vector3(162.15, -917.79, 29.1)
 
 --MINI ADVANCED MODE
 Config.EnableMealInventory		= true --This means the cook WILL HAVE TO provide meals for the cashier and delivery driver to collect
-Config.MealInventCap			= 0    --0 is unlimited 5 will only allow 5 meals in the inventory
 
 Config.EnableStuckCommand		= true --This will unfreeze the player if they happen to get stuck using /mcstuck
 Config.EnableCookCommand		= true --This will set you as a cook using /mccook
@@ -179,4 +175,4 @@ Config.driveDeliveryPoints = {
 	[19] = {x = 321.55, y = -2099.77, z = 18.2}
 }
 
-Config.Prefix = "^0[^1DGRP ^3McDonalds^0]:^4 "
+Config.Prefix = "^0[^1DGRP ^3McDonalds^0]:^4 " -- Prefix that gets added to any errors that get printed so you know where the error came from

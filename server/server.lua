@@ -112,6 +112,6 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 		xPlayer.showNotification("~b~You ate and drank a ~y~McDonalds ~b~Meal.")
 	end)
 else
-    print("\nA weird error has occurred with dgrp_mcdonalds... Please open a GitHub Issue using the Bug Template with this error code in the title: i4mdumb")
+    print("\nA weird error has occurred with dgrp_mcdonalds... Please open a GitHub Issue using the Bug Template with this error code in the title: 14mdvmb")
 end
 
