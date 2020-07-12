@@ -2,14 +2,20 @@ Config = {}
 --			General
 Config.Locale				= 'en'
 
---			Settings
+--You can toggle these to false to turn off all error/hint related Notifications, However having both as true will show also show no notifications
+Config.EnablePNotify		= false		--This uses pNotify as the Notify System
+Config.EnableMythic			= true		--This uses Mythic Notify as the Notify System
+
+Config.EnableESXNotif		= true		--This uses ESX Notifications for Payouts (if you disable, no replacement is available so you will not be notified when you get paid)
+
+--			Settings					
 --			  Jobs
-Config.EnablePlayerJobs		= true		--Enables Jobs for Players to use.
+Config.EnablePlayerJobs		= true		--Enables Jobs for Players to use. *Disabling hides the job selector, meaning no player job can be selected
 Config.EnablePlayerCook		= true		--Cook gets drinks, makes burgers and fries and gives to clerk both for NPC orders and Player orders.
 Config.EnablePlayerClerk	= true		--Clerk receives orders, gives to cook, receives orders from cook, and gives to customer. 				
 Config.EnablePlayerDriver	= true		--Driver delivers orders marked for delivery.
 
-Config.EnableNPCOrders		= true		--If False only players can RP Orders and Pay with F6 billing, if true gives RP NPC orders for cashiers and delivery drivers to undertake
+Config.EnableNPCOrders		= true		--If False only players can RP Orders and Pay with F6 billing, if true gives RP/'Fake' NPC orders for cashiers and delivery drivers to undertake
 
 Config.SpawnPeds			= true		--This Spawns Peds at the tables for the cashier to give the order to (only aesthetics)
 
@@ -40,7 +46,7 @@ Config.BikeDepositAmount	= 150		--The amount that it cost to take out the bike w
 Config.CarToSpawn			= 'vwcaddy'
 Config.BikeToSpawn			= 'nrg'
 
-Config.EnableMoreWorkMorePay	= true	--Each Time you complete a job, if true you get a pay rise for the next job.
+Config.EnableMoreWorkMorePay	= true	--Each Customer/Meal you serve, that number is used as a multiplier **Cashier  ie 10 customers served = 40 x 10 = 400** CAUTION This has no limit and can keep rising until the player logs or server restarts
 
 --			Blips
 Config.EnableBlips			= true
@@ -69,13 +75,12 @@ Config.CookBurgerTime		= 12 * 1000		--The time that it takes to make a burger.
 Config.CookPrepareTime		= 12 * 1000		--The time that it takes to prepare the meal.
 --	   Cashier Times
 Config.CashOrderTime		= 10 * 1000		--The time that it takes to take an order.
-Config.CashMealTime			= 15 * 1000		--The time that it takes to get a prepared meal.
-Config.CashDelivTime		= 5 * 1000		--The time that it takes to give the customer the meal.
+Config.CashMealTime			= 15 * 1000		--The time that it takes to get a prepared meal. (Both Delivery Driver and Cashier)
+Config.CashDelivTime		= 5 * 1000		--The time that it takes to give the customer the meal. (Both Delivery Driver and Cashier)
 
 Config.EnableDowntownDeliveries		= true
 Config.EnableBeachSideDeliveries	= false	--Coming Soon
 Config.EnableHighEndDeliveries		= false	--Coming Soon
-
 
 --	   List of Coords
 
@@ -104,7 +109,7 @@ Config.DeliveryCarSpawnMarker	= vector3(173.59, -914.2, 29.6)
 Config.DeliveryCarDespawn		= vector3(162.15, -917.79, 29.1)
 
 --MINI ADVANCED MODE
-Config.EnableMealInventory		= true --This means the cook WILL HAVE TO provide meals for the cashier and delivery driver to collect
+Config.EnableMealInventory		= true --This means the cook WILL HAVE TO provide meals for the cashier and delivery driver to collect, if no cook is making meals, the cashier and delivery driver cannot collect
 
 Config.EnableStuckCommand		= true --This will unfreeze the player if they happen to get stuck using /mcstuck
 Config.EnableCookCommand		= true --This will set you as a cook using /mccook
@@ -120,6 +125,8 @@ Config.Cash1Name		= 'prop_cash_note_01'
 
 Config.BurgerNames		= {a = 'prop_cs_burger_01', b = 'prop_food_bs_burg1', c = 'prop_food_bs_burg3'}
 Config.FriesName		= 'prop_food_bs_chips'
+
+--Prop Positons
 
 Config.TrayPosition			= {x = 178.833, y = -909.116, z = 31.597}
 Config.TrayDonePosition		= {x = 180.715, y = -909.724, z = 31.597}
@@ -175,4 +182,4 @@ Config.driveDeliveryPoints = {
 	[19] = {x = 321.55, y = -2099.77, z = 18.2}
 }
 
-Config.Prefix = "^0[^1DGRP ^3McDonalds^0]:^4 " -- Prefix that gets added to any errors that get printed so you know where the error came from
+Config.Prefix = "^0[^1DGRP ^3McDonalds^0]:^4 " -- Prefix that gets added to any errors that get printed

@@ -16,9 +16,7 @@ Citizen.CreateThread(function()
 	end
 
     if ESX.GetPlayerData().job.name ~= nil then
-        print(Config.Prefix.."ESX.GetPlayerData().job.name ~= nil setting Job Name")
         currentPlayerJobName = ESX.GetPlayerData().job.name
-        print(Config.Prefix.."Job Name has been set to: "..currentPlayerJobName)
     else
         print(Config.Prefix.."^1ESX.GetPlayerData().job.name == nil Cannot set job name!")
     end
@@ -384,7 +382,11 @@ end
 
 function getBurger()
     if invBurger >= 2 then
+        if Config.EnablePNotify == true then
         exports.pNotify:SendNotification({text = _U('BurgerError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('BurgerError'))
+        end
     else
         local tempWait = Config.CookBurgerTime / 3
         playerIsBusy(true)
@@ -415,7 +417,11 @@ end
 
 function getFries()
     if invFries >= 2 then
-        exports.pNotify:SendNotification({text = _U('FriesError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true then
+            exports.pNotify:SendNotification({text = _U('FriesError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('FriesError'))
+        end
     else
         playerIsBusy(true)
         SetEntityHeading(playerPed, Config.PlrCookFriesCoords.h)
@@ -437,7 +443,11 @@ end
 
 function getDrink()
     if invDrink >= 2 then
-        exports.pNotify:SendNotification({text = _U('DrinkError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true then
+            exports.pNotify:SendNotification({text = _U('DrinkError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('DrinkError'))
+        end
     else
         playerIsBusy(true)
         SetEntityHeading(playerPed, Config.PlrCookDrinkCoords.h)
@@ -498,15 +508,23 @@ function prepareMeal()
                     payBonus = Config.CashJobPay * bonus
                     TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
                     if mealsMade > 1 then
-                        ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+                        if Config.EnableESXNotif == true then
+                            ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+                        end
                     end
-                    ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+                    if Config.EnableESXNotif == true then
+                        ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+                    end
                 else
                     TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
-                    ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+                    if Config.EnableESXNotif == true then
+                        ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+                    end
                 end
             else
-                ESX.ShowNotification('~b~Server owner has disabled payments, you should expect your payment from the player who ordered.')
+                if Config.EnableESXNotif == true then
+                    ESX.ShowNotification('~b~Server owner has disabled payments, you should expect your payment from the player who ordered.')
+                end
             end
             trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayDonePosition.x, Config.TrayDonePosition.y, Config.TrayDonePosition.z, true, true, true)
             bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
@@ -519,8 +537,13 @@ function prepareMeal()
             DeleteObject(bagProp)
             DeleteObject(drinkProp)
         else
-            exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-            exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            if Config.EnablePNotify == true and Config.EnableMythic == false then
+                exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+                exports['mythic_notify']:DoHudText('error', _U('MealError'))
+                exports['mythic_notify']:DoHudText('error', 'You Currently have x'..invBurger..' Fresh Burger(s), x'..invDrink..' Fresh Drink(s) and x'..invFries..' Fresh Fries')
+            end
         end
     else
         if invBurger > 0 and invDrink > 0 and invFries > 0 then
@@ -550,17 +573,29 @@ function prepareMeal()
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_burger')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_drink')
             TriggerServerEvent("dgrp_mcdonalds:removeItem", 'mcdonalds_fries')
-            if Config.EnableMoreWorkMorePay == true then
-                bonus = 1 * mealsMade
-                payBonus = Config.CashJobPay * bonus
-                TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
-                if mealsMade > 1 then
-                    ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+            if Config.EnableNPCOrders == true then
+                if Config.EnableMoreWorkMorePay == true then
+                    bonus = 1 * mealsMade
+                    payBonus = Config.CashJobPay * bonus
+                    TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
+                    if mealsMade > 1 then
+                        if Config.EnableESXNotif == true then
+                            ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+                        end
+                    end
+                    if Config.EnableESXNotif == true then
+                        ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+                    end
+                else
+                    TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
+                    if Config.EnableESXNotif == true then
+                        ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+                    end
                 end
-                ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
             else
-                TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CookJobPay)
-                ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CookJobPay..'~b~.')
+                if Config.EnableESXNotif == true then
+                    ESX.ShowNotification('~b~Server owner has disabled payments, you should expect your payment from the player who ordered.')
+                end
             end
             trayProp = CreateObject(GetHashKey(Config.TrayName), Config.TrayDonePosition.x, Config.TrayDonePosition.y, Config.TrayDonePosition.z, true, true, true)
             bagProp = CreateObject(GetHashKey(Config.BurgerNames.c), Config.BagDonePosition.x, Config.BagDonePosition.y, Config.BagDonePosition.z, true, true, true)
@@ -573,8 +608,13 @@ function prepareMeal()
             DeleteObject(bagProp)
             DeleteObject(drinkProp)
         else
-            exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-            exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            if Config.EnablePNotify == true and Config.EnableMythic == false then
+                exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+            elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+                exports['mythic_notify']:DoHudText('error', _U('MealError'))
+                exports['mythic_notify']:DoHudText('error', 'You Currently have x'..invBurger..' Fresh Burger(s), x'..invDrink..' Fresh Drink(s) and x'..invFries..' Fresh Fries')
+            end
         end
     end
 end
@@ -618,7 +658,11 @@ function takeOrder()
         hasTakenOrder = true
         playerIsBusy(false)
     else
-        exports.pNotify:SendNotification({text = _U('CashError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})       
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('CashError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})       
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('CashError'))
+        end
     end    
 end
 
@@ -665,14 +709,30 @@ function pickupOrder()
                     DeleteObject(drinkProp)
                     setDelivery()
                 else
-                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                    end
                 end
             elseif hasOrder == true and hasTakenOrder == true then
-                exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                end
             elseif hasTakenOrder == false and hasOrder == false then
-                exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError1'))
+                end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                end
             end
         else
             if mealInvent > 0 then
@@ -713,7 +773,11 @@ function pickupOrder()
                 DeleteObject(bagProp3)
                 DeleteObject(drinkProp)
             else
-                exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                end
             end
         end
     else
@@ -758,14 +822,30 @@ function pickupOrder()
                     DeleteObject(drinkProp)
                     setDelivery()
                 else
-                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                    end
                 end
             elseif hasOrder == true and hasTakenOrder == true then
-                exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                end
             elseif hasTakenOrder == false and hasOrder == false then
-                exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError1'))
+                end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                end
             end
         else
             if mealInvent > 0 then
@@ -806,7 +886,11 @@ function pickupOrder()
                 DeleteObject(bagProp3)
                 DeleteObject(drinkProp)
             else
-                exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                end
             end
         end
     end
@@ -816,21 +900,18 @@ function setDelivery()
     repeat
         deliveryPoint = math.random(1, #Config.cashDeliveryPoints)
 	until deliveryPoint ~= lastDelivery
+    deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
+  	taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
+	lastDelivery = deliveryPoint
+    isDelivering = true
+    setGPS(deliveryCoords)
+    if Config.EnablePNotify == true and Config.EnableMythic == false then
+        exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "success", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+        exports['mythic_notify']:DoHudText('success', _U('Table')..deliveryPoint)
+    end
     if Config.SpawnPeds == true then
-        deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
-  	    taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
-	    lastDelivery = deliveryPoint
-        isDelivering = true
-        setGPS(deliveryCoords)
-        exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
         spawnPed()
-    else
-        deliveryCoords = Config.cashDeliveryPoints[deliveryPoint]
-  	    taskPoints['delivery'] = { x = deliveryCoords.x, y = deliveryCoords.y, z = deliveryCoords.z}
-	    lastDelivery = deliveryPoint
-        isDelivering = true
-        setGPS(deliveryCoords)
-        exports.pNotify:SendNotification({text = _U('Table')..deliveryPoint, type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
     end
 end
 
@@ -838,7 +919,6 @@ function spawnPed()
     repeat
         currentPed = math.random(1, #Config.NPCNames)
     until currentPed ~= lastPed
-    dPrint("Ped Name: "..Config.NPCNames[currentPed].name)
     RequestModel(Config.NPCNames[currentPed].name)
     while not HasModelLoaded(Config.NPCNames[currentPed].name) do
         Wait(1)
@@ -880,12 +960,18 @@ function deliverOrder()
         payBonus = Config.CashJobPay * bonus
         TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
         if customersServed > 1 then
-            ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+            if Config.EnableESXNotif == true then
+                ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+            end
         end
-        ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+        if Config.EnableESXNotif == true then
+            ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+        end
     else
         TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.CashJobPay)
-        ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CashJobPay..'~b~.')
+        if Config.EnableESXNotif == true then
+            ESX.ShowNotification('~b~You were paid ~g~+$'..Config.CashJobPay..'~b~.')
+        end
     end
     playerIsBusy(false)
     hasOrder = false
@@ -912,12 +998,24 @@ function pickupDelivery()
                     setDriveDelivery()
                     playerIsBusy(false)
                 elseif dHasOrder == true then
-                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                    end
                 else
-                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                    end
                 end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                end
             end
         else
             if dHasOrder == false then
@@ -932,9 +1030,17 @@ function pickupDelivery()
                 setDriveDelivery()
                 playerIsBusy(false)
             elseif dHasOrder == true then
-                exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                end
             end
         end
     else
@@ -951,12 +1057,24 @@ function pickupDelivery()
                     invMeal = invMeal + 1
                     playerIsBusy(false)
                 elseif dHasOrder == true then
-                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                    end
                 else
-                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                    end
                 end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 5000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError3'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError3'))
+                end
             end
         else
             if dHasOrder == false then
@@ -969,9 +1087,17 @@ function pickupDelivery()
                 invMeal = invMeal + 1
                 playerIsBusy(false)
             elseif dHasOrder == true then
-                exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError'))
+                end
             else
-                exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('PickupError2'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('PickupError2'))
+                end
             end
         end
     end
@@ -985,7 +1111,11 @@ function setDriveDelivery()
 	lastDelivery = deliveryPoint
     isDriveDelivering = true
     setGPS(dDeliveryCoords)
-    exports.pNotify:SendNotification({text = _U('DelivNotif'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    if Config.EnablePNotify == true and Config.EnableMythic == false then
+        exports.pNotify:SendNotification({text = _U('DelivNotif'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+        exports['mythic_notify']:DoHudText('inform', _U('DelivNotif'))
+    end
 end
 
 function isMyCar()
@@ -995,10 +1125,18 @@ end
 function openWorkVehicleMenu()
     if driverHasCar == true then
         replaceLostCar(true)
-        exports.pNotify:SendNotification({text = _U('CarError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('CarError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('CarError'))
+        end
     else
         openVehicleMenu()
-        exports.pNotify:SendNotification({text = _U('CarChoose'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('CarChoose'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('inform', _U('CarChoose'))
+        end
     end
 end
 
@@ -1006,7 +1144,11 @@ function replaceLostCar(bool)
     if bool == true then
         ESX.Game.DeleteVehicle(currentCar)			
         driverHasCar = false
-        exports.pNotify:SendNotification({text = _U('CarError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('CarError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('CarError1'))
+        end
     else
         ESX.UI.CloseAll()
     end
@@ -1032,10 +1174,18 @@ function openVehicleMenu()
             playerIsBusy(false)
             spawnVehicle(Config.CarToSpawn, Config.VanDepositAmount)  
             if Config.PayDeposit == true then
-                exports.pNotify:SendNotification({text = _U('DepositNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('DepositNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                     exports['mythic_notify']:DoHudText('success', _U('DepositNotif'))
+                end
                 paidDeposit = Config.VanDepositAmount
             else
-                exports.pNotify:SendNotification({text = _U('SpawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('SpawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                     exports['mythic_notify']:DoHudText('success', _U('SpawnedNotif'))
+                end
             end
 
         end
@@ -1045,10 +1195,18 @@ function openVehicleMenu()
             playerIsBusy(false)
             spawnVehicle(Config.BikeToSpawn, Config.BikeDepositAmount)  
             if Config.PayDeposit == true then
-                exports.pNotify:SendNotification({text = _U('DepositNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('DepositNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                     exports['mythic_notify']:DoHudText('success', _U('DepositNotif'))
+                end
                 paidDeposit = Config.BikeDepositAmount
             else
-                exports.pNotify:SendNotification({text = _U('SpawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('SpawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                     exports['mythic_notify']:DoHudText('success', _U('SpawnedNotif'))
+                end 
             end
         end
         menu.close()
@@ -1104,15 +1262,25 @@ function deleteCar()
     if isMyCar() == true then
         if Config.PayDeposit == true then
             TriggerServerEvent("dgrp_mcdonalds:returnDeposit", paidDeposit)
-            ESX.ShowNotification('~b~Your deposit has been returned ~g~+$'..paidDeposit..'~b~.')
+            if Config.EnableESXNotif == true then
+                ESX.ShowNotification('~b~Your deposit has been returned ~g~+$'..paidDeposit..'~b~.')
+            end
             paidDeposit = 0
         end
     	local entity = GetVehiclePedIsIn(GetPlayerPed(-1), false)	
 	    ESX.Game.DeleteVehicle(entity)			
         driverHasCar = false
-        exports.pNotify:SendNotification({text = _U('DespawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('DespawnedNotif'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('success', _U('DespawnedNotif'))
+        end
     else
-        exports.pNotify:SendNotification({text = _U('ReturnError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if Config.EnablePNotify == true and Config.EnableMythic == false then
+            exports.pNotify:SendNotification({text = _U('ReturnError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+            exports['mythic_notify']:DoHudText('error', _U('ReturnError'))
+        end
     end
 end
 
@@ -1142,12 +1310,18 @@ function driveFromDelivery()
         payBonus = Config.DelivJobPay * bonus
         TriggerServerEvent("dgrp_mcdonalds:getPaid", payBonus)
         if customersServed > 1 then
-            ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+            if Config.EnableESXNotif == true then
+                ESX.ShowNotification('~b~You received a ~g~bonus~b~ for consecutive work. keep it up! Bonus: ~g~x'..bonus)
+            end
         end
-        ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+        if Config.EnableESXNotif == true then
+            ESX.ShowNotification('~b~You were paid ~g~+$'..payBonus..'~b~.')
+        end
     else
         TriggerServerEvent("dgrp_mcdonalds:getPaid", Config.DelivJobPay)
-        ESX.ShowNotification('~b~You were paid ~g~+$'..Config.DelivJobPay..'~b~.')
+        if Config.EnableESXNotif == true then
+            ESX.ShowNotification('~b~You were paid ~g~+$'..Config.DelivJobPay..'~b~.')
+        end
     end
 
     dHasOrder = false
@@ -1267,11 +1441,19 @@ function openMenu()
         if data.current.value == 'cashier' then
             if Config.EnablePlayerClerk == true then
                 if currentJob == 'cashier' then
-                    exports.pNotify:SendNotification({text = _U('CashierError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('CashierError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('CashierError'))
+                    end
                 else
                     currentJob = 'cashier'
                     setJobName(currentJob)
-                    exports.pNotify:SendNotification({text = _U('CashierSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('CashierSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('success', _U('CashierSuccess'))
+                    end 
                     onDuty = true
                     isDelivering = false
                     invMeal = 0
@@ -1282,17 +1464,29 @@ function openMenu()
                     hasTakenOrder = false
                 end
             else
-                exports.pNotify:SendNotification({text = _U('CashierError1'), type = "error", timeout = 3000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('CashierError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('CashierError1'))
+                end
             end
         end
         if data.current.value == 'cook' then
             if Config.EnablePlayerCook == true then
                 if currentJob == 'cook' then
-                    exports.pNotify:SendNotification({text = _U('CookError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('CookError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('CookError'))
+                    end
                 else
                     currentJob = 'cook'
                     setJobName(currentJob)
-                    exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('success', _U('CookSuccess'))
+                    end 
                     onDuty = true
                     isDelivering = false
                     invMeal = 0
@@ -1303,17 +1497,29 @@ function openMenu()
                     hasTakenOrder = false
                 end 
             else
-                exports.pNotify:SendNotification({text = _U('CookError1'), type = "error", timeout = 3000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('CookError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('CookError1'))
+                end 
             end
         end
         if data.current.value == 'deliv' then
             if Config.EnablePlayerDriver == true then
                 if currentJob == 'deliv' then
-                    exports.pNotify:SendNotification({text = _U('DriverError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('DriverError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('DriverError'))
+                    end
                 else
                     currentJob = 'deliv'
                     setJobName(currentJob)
-                    exports.pNotify:SendNotification({text = _U('DriverSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('DriverSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('success', _U('DriverSuccess'))
+                    end 
                     onDuty = true
                     isDelivering = false
                     invMeal = 0
@@ -1324,7 +1530,11 @@ function openMenu()
                     hasTakenOrder = false
                 end
             else
-                exports.pNotify:SendNotification({text = _U('DriverError1'), type = "error", timeout = 3000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = _U('DriverError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', _U('DriverError1'))
+                    end 
             end
         end
         menu.close()
@@ -1355,7 +1565,6 @@ Citizen.CreateThread(function()
         RegisterCommand("mccook", function()
             currentJob = 'cook'
             setJobName(currentJob)
-            exports.pNotify:SendNotification({text = _U('CookSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
             invMeal = 0
@@ -1371,7 +1580,6 @@ Citizen.CreateThread(function()
         RegisterCommand("mccash", function()
             currentJob = 'cashier'
             setJobName(currentJob)
-            exports.pNotify:SendNotification({text = _U('CashierSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
             invMeal = 0
@@ -1387,7 +1595,6 @@ Citizen.CreateThread(function()
         RegisterCommand("mcdeliv", function()
             currentJob = 'deliv'
             setJobName(currentJob)
-            exports.pNotify:SendNotification({text = _U('DriverSuccess'), type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}}) 
             onDuty = true
             isDelivering = false
             invMeal = 0
