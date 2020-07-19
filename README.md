@@ -1,24 +1,29 @@
 # dgrp_mcdonaldsjob
-- A McDonalds Job for ESX. 
+- A McDonalds Job for ESX - soon will come to other frameworks. 
 - Comes with Addon Building and Addon Vehicles.
 - Multiple Roles: Cashier, Cook and Delivery Driver all with animations.
 - Extensive Config for easy customization.
 - Comes with McDonalds Burgers, Drinks ECT.
-- Highly Customizable.
-- Excellent for RP.
+- Excellent for RP - Working on incorperating P2P orders.
 - All within 1 Addon!
-- Constantly updating and making better!
+- Constantly updating to further improve - so be sure to check back!
 
-You Can Checkout the Release Post Here:
+You can checkout the Release Post for more up to date Information here:
 [forum.CFX.RE - DGRP_McDonalds](https://forum.cfx.re/t/release-mcdonalds-job-a-fast-food-restaurant-job-for-esx/)
 
+![Screenshot](https://i.imgur.com/enP6tBq.png)
 ![Logo](https://i.imgur.com/dA1Qe1d.png)
-![Screenshot](https://i.imgur.com/x95rpFR.png)
 
-[Video](https://youtu.be/WecEmBWQ5ug)
+The video below shows a breif demonstration of the addon, however this video, although I update it regurlarly will always be outdated and not refer as to how the addon looks at this very moment, as almost every day this addon is being worked on to further improve it, usually before or at the time of a big update a revised video is made.
+[YouTube - Demonstration Video](https://youtu.be/WecEmBWQ5ug)
+
+## Support
+- For help on something that is going wrong - [Click Here](https://github.com/FuryFight3r/dgrp_mcdonaldsjob/issues/new?assignees=FuryFight3r&labels=help+wanted&template=help-template.md&title=%5BHELP%5D)
+- For reporting a bug (a GAME BREAKING bug, not 'NPC isn't sitting') - [Click Here](https://github.com/FuryFight3r/dgrp_mcdonaldsjob/issues/new?assignees=FuryFight3r&labels=bug&template=bug-template.md&title=%5BBUG%5D)
+- If you have a suggestion (please make sure you are familiar with my work and what I am currently working on using the Release Post on Forum.CFX.re) - [Click Here](https://github.com/FuryFight3r/dgrp_mcdonaldsjob/issues/new?assignees=FuryFight3r&labels=enhancement&template=suggestion-template.md&title=%5BSUGGESTION%5D)
 
 ## DISCLAIMER
-DO NOT re-upload (and claim as your own work) without my permission. If you make changes Create a pull request though GitHub and I will add it for everyone to download including credit to your part.
+DO NOT re-upload (and claim as your own work) without my permission. If you wish to share your changes Create a pull request though GitHub and depending on the changes it may be added including credit to your part.
 
 ## Requirements
 - [es_extended(v1-final)](https://github.com/ESX-Org/es_extended/tree/v1-final)
@@ -26,7 +31,7 @@ DO NOT re-upload (and claim as your own work) without my permission. If you make
 - [esx_addonaccount](https://github.com/ESX-Org/esx_addonaccount)
 - [esx_addoninventory](https://github.com/ESX-Org/esx_addoninventory)
 - [esx_basicneeds](https://github.com/ESX-Org/esx_basicneeds)
-- [pNotify](https://github.com/Nick78111/pNotify)
+- [pNotify](https://github.com/Nick78111/pNotify) or [MythicNotify](https://github.com/JayMontana36/mythic_notify)
 - [progressBars](https://github.com/EthanPeacock/progressBars)
 
 ## Download & Installation
@@ -45,6 +50,7 @@ git clone https://github.com/FuryFight3r/dgrp_mcdonaldsjob [dgrp]/dgrp_mcdonalds
 ### Manually
 - Download https://github.com/FuryFight3r/dgrp_mcdonaldsjob/archive/master.zip
 - Put it in `[dgrp]` directory
+- Make sure to remove only the -master at the end of the name.
 
 
 ## Installation
