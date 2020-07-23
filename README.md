@@ -31,8 +31,14 @@ DO NOT re-upload (and claim as your own work) without my permission. If you wish
 - [esx_addonaccount](https://github.com/ESX-Org/esx_addonaccount)
 - [esx_addoninventory](https://github.com/ESX-Org/esx_addoninventory)
 - [esx_basicneeds](https://github.com/ESX-Org/esx_basicneeds)
-- [pNotify](https://github.com/Nick78111/pNotify) or [MythicNotify](https://github.com/JayMontana36/mythic_notify)
+- [pNotify](https://github.com/Nick78111/pNotify) or [Mythic_Notify](https://github.com/JayMontana36/mythic_notify)
 - [progressBars](https://github.com/EthanPeacock/progressBars)
+
+## Requirements INFO
+The above linked Mythic_Notify is a forked version of the OG-Version, depending on what version you are using you may need to replace all the 'DoHudText' with 'SendAlert' inside the Client.LUA or just download the version linked above.
+Breif Tutorial (Press CTRL+F to find or CTRL+SHIFT+F to find/replace):
+![ChangeExportTutorial](https://i.imgur.com/8x3yPFp.gif)
+You can toggle between using pNotify or Mythic_Notify in the Config.
 
 ## Download & Installation
 
