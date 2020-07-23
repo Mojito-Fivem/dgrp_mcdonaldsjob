@@ -419,7 +419,7 @@ function getFries()
     if invFries >= 2 then
         if Config.EnablePNotify == true then
             exports.pNotify:SendNotification({text = _U('FriesError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
             exports['mythic_notify']:DoHudText('error', _U('FriesError'))
         end
     else
@@ -445,7 +445,7 @@ function getDrink()
     if invDrink >= 2 then
         if Config.EnablePNotify == true then
             exports.pNotify:SendNotification({text = _U('DrinkError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-        elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+        elseif Config.EnablePNotify == false and Config.EnableMythic == true then
             exports['mythic_notify']:DoHudText('error', _U('DrinkError'))
         end
     else
@@ -540,7 +540,7 @@ function prepareMeal()
             if Config.EnablePNotify == true and Config.EnableMythic == false then
                 exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
                 exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-            elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+            elseif Config.EnablePNotify == false and Config.EnableMythic == true then
                 exports['mythic_notify']:DoHudText('error', _U('MealError'))
                 exports['mythic_notify']:DoHudText('error', 'You Currently have x'..invBurger..' Fresh Burger(s), x'..invDrink..' Fresh Drink(s) and x'..invFries..' Fresh Fries')
             end
@@ -611,7 +611,7 @@ function prepareMeal()
             if Config.EnablePNotify == true and Config.EnableMythic == false then
                 exports.pNotify:SendNotification({text = _U('MealError'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
                 exports.pNotify:SendNotification({text = "You Currently have x"..invBurger.." Fresh Burger(s), x"..invDrink.." Fresh Drink(s) and x"..invFries.." Fresh Fries", type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
-            elseif COnfig.EnablePNotify == false and Config.EnableMythic == true then
+            elseif Config.EnablePNotify == false and Config.EnableMythic == true then
                 exports['mythic_notify']:DoHudText('error', _U('MealError'))
                 exports['mythic_notify']:DoHudText('error', 'You Currently have x'..invBurger..' Fresh Burger(s), x'..invDrink..' Fresh Drink(s) and x'..invFries..' Fresh Fries')
             end
