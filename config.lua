@@ -82,6 +82,37 @@ Config.EnableDowntownDeliveries		= true
 Config.EnableBeachSideDeliveries	= false	--Coming Soon
 Config.EnableHighEndDeliveries		= false	--Coming Soon
 
+-- Player Fines for Consuming Items ECT
+
+Config.PlayerFines = {
+	ConsumedDrink = {
+		Description = "You were fined for consuming work property without paying! Fine Amount: ",
+		Amount = 500
+	},
+	ConsumedFries = {
+		Description = "You were fined for consuming work property without paying! Fine Amount: ",
+		Amount = 500
+	},
+	ConsumedBurger = {
+		Description = "You were fined for consuming work property without paying! Fine Amount: ",
+		Amount = 500
+	},
+	ConsumedMeal = {
+		Description = "You were fined for consuming work property without paying! Fine Amount: ",
+		Amount = 2000
+	}
+}
+
+-- Player Bad Points is a flag system that if a worker breaks too many rules (Consuming Items, attacking customers ect) after gaining the below set amount of 'bad points' they will be fired as a McDonalds Worker
+-- Enable Player Bad Points System - true/false
+Config.EnablePlayerBadPoints = true
+-- Points before the player gets Fired/Banned
+Config.BadPointLimit = 3
+-- true = Player will be permanatly banned (until server restart) - false = Player will be banned/fired for a limited time
+Config.BadEggPermOrTime = false
+-- Time (In Minutes) that the player is Banned/Fired from McDonalds
+Config.BadEggTimer = 10
+
 --	   List of Coords
 
 Config.JobMenuCoords		= vector3(182.8,-898.49,30.6)

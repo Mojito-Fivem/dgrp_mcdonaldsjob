@@ -33,7 +33,7 @@ local hintToDisplay = _U('NoHintError')
 local displayHint = false
 local currentZone = 'none'
 local currentJob = 'none'
-local playerPed = PlayerPedId()
+local playerPed = PlayerPedId(-1)
 
 local invDrink = 0
 local invBurger = 0
@@ -85,6 +85,8 @@ local currentPed
 local lastPed
 local delivered = false
 local cobber
+local badPoints = 0
+local isFired = false
 
 --Press [E] Buttons
 Citizen.CreateThread(function()
@@ -327,6 +329,29 @@ function taskTrigger(zone)
         deleteCar()
     end
 end
+--Check if Inside work Vehicle
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(500)
+        if IsPedInAnyVehicle(playerPed, false) then
+           if isMyCar() then
+                if currentJob == 'deliv' and onDuty and isDriveDelivering then
+                    if dDeliveryCoords ~= nil then
+                        setGPS(dDeliveryCoords)
+                    else
+                        dPrint("Delivery Cords are NIL unable to re-assign GPS Blip")
+                    end
+                end
+            else
+                if currentJob == 'deliv' and onDuty and isDriveDelivering then
+                    RemoveBlip(Blips['deliver'])
+                end
+            end 
+        else
+            RemoveBlip(Blips['deliver'])
+        end
+    end
+end)
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)		
@@ -352,8 +377,186 @@ AddEventHandler('esx:setJob', function(job)
     else
         onDuty = false
     end
+    if currentJob == 'clean' then
+        onDuty = false
+    end
     refreshBlips()						
 end)
+
+RegisterNetEvent('dgrp_mcdonalds:consumedItem')
+AddEventHandler('dgrp_mcdonalds:consumedItem', function(item)
+    if Config.EnablePlayerBadPoints then
+        if item == 1 then --Drink
+            if onDuty then
+                dPrint("Woah! your on duty and drinking an object that only a cook can get?")
+                if invDrink > 0 then
+                    dPrint("Aye!?!? according to the DGRP_McDonalds Script you gained a drink by pouring yourself one! This just will not do!")
+                    invDrink = invDrink - 1
+                    Citizen.Wait(1000)
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedDrink.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedDrink.Description.."$"..Config.PlayerFines.ConsumedDrink.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedDrink.Description.."$"..Config.PlayerFines.ConsumedDrink.Amount)
+                    end
+                else
+                    dPrint("It seems as though you didn't pour yourself a drink, so you might have paid for it, please change to Cleaner/Off Duty next time your having a break!")
+                end
+            else
+                dPrint("We suspect that your are good! thanks for being off-duty while consuming food/drink")
+                if invDrink > 0 then
+                    dPrint("Although We can see here that you did indeed pour yourself a drink from the machine! This just will not do!")
+                    invDrink = invDrink - 1
+                    Citizen.Wait(1000)
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedDrink.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedDrink.Description.."$"..Config.PlayerFines.ConsumedDrink.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedDrink.Description.."$"..Config.PlayerFines.ConsumedDrink.Amount)
+                    end
+                end
+            end
+        elseif item == 2 then --Fries
+            if onDuty then
+                dPrint("Woah! your on duty and eating an object that only a cook can get?")
+                if invFries > 0 then
+                    dPrint("Aye!?!? according to the DGRP_McDonalds Script you gained fries by cooking youself some! This just will not do!")
+                    invFries = invFries - 1
+                    Citizen.Wait(1000)
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedFries.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedFries.Description.."$"..Config.PlayerFines.ConsumedFries.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedFries.Description.."$"..Config.PlayerFines.ConsumedFries.Amount)
+                    end
+                else
+                    dPrint("It seems as though you didn't cook these fries, so you might have paid for them, please change to Cleaner/Off Duty next time your having a break!")
+                end
+            else
+                dPrint("We suspect that your are good! thanks for being off-duty while consuming food/drink")
+                if invFries > 0 then
+                    Citizen.Wait(1000)
+                    dPrint("Although We can see here that you did indeed cook these fries! This just will not do!")
+                    invFries = invFries - 1
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedFries.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedFries.Description.."$"..Config.PlayerFines.ConsumedFries.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedFries.Description.."$"..Config.PlayerFines.ConsumedFries.Amount)
+                    end
+                end
+            end
+        elseif item == 3 then --Burger
+            if onDuty then
+                dPrint("Woah! your on duty and eating an object that only a cook can get?")
+                if invBurger > 0 then
+                    dPrint("Aye!?!? according to the DGRP_McDonalds Script you gained a Burger by cooking yourself one! This just will not do!")
+                    invBurger = invBurger - 1
+                    Citizen.Wait(1000)
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedBurger.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedBurger.Description.."$"..Config.PlayerFines.ConsumedBurger.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedBurger.Description.."$"..Config.PlayerFines.ConsumedBurger.Amount)
+                    end
+                else
+                    dPrint("It seems as though you didn't cook this Burger, so you might have paid for it, please change to Cleaner/Off Duty next time your having a break!")
+                end
+            else
+                dPrint("We suspect that your are good! thanks for being off-duty while consuming food/drink")
+                if invBurger > 0 then
+                    Citizen.Wait(1000)
+                    dPrint("Although We can see here that you did indeed cook this Burger! This just will not do!")
+                    invBurger = invBurger - 1
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedBurger.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedBurger.Description.."$"..Config.PlayerFines.ConsumedBurger.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedBurger.Description.."$"..Config.PlayerFines.ConsumedBurger.Amount)
+                    end
+                end
+            end
+        elseif item == 4 then --Meal
+            if onDuty then
+                dPrint("Woah! Ang' on just a minit!")
+                if invMeal > 0 then
+                    Citizen.Wait(1000)
+                    dPrint("Aye!?!? according to the DGRP_McDonalds Script you gained a Meal by grabbing yourself one! This just will not do!")
+                    invMeal = invMeal - 1
+                    cancelCurrentOrder()
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedMeal.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedMeal.Description.."$"..Config.PlayerFines.ConsumedMeal.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedMeal.Description.."$"..Config.PlayerFines.ConsumedMeal.Amount)
+                    end
+                else
+                    dPrint("It seems as though you didn't cook this Burger, so you might have paid for it, please change to Cleaner/Off Duty next time your having a break!")
+                end
+            else
+                dPrint("We suspect that your are good! thanks for being off-duty while consuming food/drink")
+                if invMeal > 0 and hasOrder and hasTakenOrder and isDelivering or invMeal > 0 and dHasOrder and isDriveDelivering then
+                    Citizen.Wait(1000)
+                    dPrint("Although We can see here that you did indeed grab this meal from the counter! This just will not do!")
+                    invMeal = invMeal - 1
+                    cancelCurrentOrder()
+                    TriggerServerEvent('dgrp_mcdonalds:payDeposit', Config.PlayerFines.ConsumedMeal.Amount)
+                    if Config.EnablePNotify then
+                        exports.pNotify:SendNotification({text = Config.PlayerFines.ConsumedMeal.Description.."$"..Config.PlayerFines.ConsumedMeal.Amount, type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnableMythic then
+                        exports['mythic_notify']:DoHudText('error', Config.PlayerFines.ConsumedMeal.Description.."$"..Config.PlayerFines.ConsumedMeal.Amount)
+                    end
+                end
+            end
+        end
+
+        Citizen.Wait(1000)
+
+        if Config.EnablePlayerBadPoints then
+            if badPoints < Config.BadPointLimit then
+                badPoints = badPoints + 1
+                if Config.EnablePNotify then
+                    exports.pNotify:SendNotification({text = "You have gained a Bad Point you now have "..badPoints.."/"..Config.BadPointLimit..". Continuing to break the rules will result in your instant dismissal!", type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnableMythic then
+                    exports['mythic_notify']:DoHudText('error', "You have gained a Bad Point you now have "..badPoints.."/"..Config.BadPointLimit..". Continuing to break the rules will result in your instant dismissal!")
+                end
+                if badPoints >= Config.BadPointLimit then
+                    fireWorker()
+                end
+            else
+                fireWorker()
+            end
+        end
+    end
+end)
+
+function fireWorker()
+    currentJob = nil
+
+    if Config.EnablePNotify then
+        exports.pNotify:SendNotification({text = "You have been FIRED from McDonalds for breaking too many rules!", type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+    elseif Config.EnableMythic then
+        exports['mythic_notify']:DoHudText('error', "You have been FIRED from McDonalds for breaking too many rules!")
+    end
+    TriggerServerEvent('dgrp_mcdonalds:fireWorker')
+end
+
+function cancelCurrentOrder()
+    if currentJob == 'cashier' then
+        playerIsBusy(false)
+        hasOrder = false
+        hasTakenOrder = false
+        isDelivering = false
+        deliveryCoords = nil
+        deletePed()
+        delivered = true
+    elseif currentJob == 'deliv' then
+        dHasOrder = false
+        isDriveDelivering = false
+        dDeliveryCoords = nil
+        RemoveBlip(Blips['deliver'])
+    end
+end
 
 function setJobName(jobName)
     if ESX ~= nil then
@@ -364,6 +567,8 @@ function setJobName(jobName)
                 TriggerServerEvent('dgrp_mcdonalds:setDelivJob')
             elseif jobName == 'cook' then
                 TriggerServerEvent('dgrp_mcdonalds:setCookJob')
+            elseif jobName == 'clean' then
+                TriggerServerEvent('dgrp_mcdonalds:setCleanJob')
             else
                 dPrint("Something went Wrong Setting McDonalds Job")
             end
@@ -1110,11 +1315,19 @@ function setDriveDelivery()
 	dDeliveryCoords = Config.driveDeliveryPoints[deliveryPoint]
 	lastDelivery = deliveryPoint
     isDriveDelivering = true
-    setGPS(dDeliveryCoords)
+    --setGPS(dDeliveryCoords)
     if Config.EnablePNotify == true and Config.EnableMythic == false then
-        exports.pNotify:SendNotification({text = _U('DelivNotif'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        if driverHasCar then
+            exports.pNotify:SendNotification({text = _U('DelivNotif'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        else
+            exports.pNotify:SendNotification({text = _U('DelivNotif1'), type = "info", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+        end
     elseif Config.EnablePNotify == false and Config.EnableMythic == true then
-        exports['mythic_notify']:DoHudText('inform', _U('DelivNotif'))
+        if driverHasCar then
+            exports['mythic_notify']:DoHudText('inform', _U('DelivNotif'))
+        else
+            exports['mythic_notify']:DoHudText('inform', _U('DelivNotif1'))
+        end
     end
 end
 
@@ -1172,6 +1385,7 @@ function openVehicleMenu()
             menu.close()
 	        vehicleMenuIsOpen = false
             playerIsBusy(false)
+            driverHasCar = true
             spawnVehicle(Config.CarToSpawn, Config.VanDepositAmount)  
             if Config.PayDeposit == true then
                 if Config.EnablePNotify == true and Config.EnableMythic == false then
@@ -1193,6 +1407,7 @@ function openVehicleMenu()
             menu.close()
 	        vehicleMenuIsOpen = false
             playerIsBusy(false)
+            driverHasCar = true
             spawnVehicle(Config.BikeToSpawn, Config.BikeDepositAmount)  
             if Config.PayDeposit == true then
                 if Config.EnablePNotify == true and Config.EnableMythic == false then
@@ -1296,7 +1511,7 @@ function setGPS(coords)
 end
 
 function driveFromDelivery()
- startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
+    startAnim("mp_am_hold_up", "purchase_beerbox_shopkeeper")
     exports['progressBars']:startUI(Config.CashDelivTime, _U('GiveBar'))
     FreezeEntityPosition(playerPed, true)
     Citizen.Wait(Config.CashDelivTime)
@@ -1432,12 +1647,42 @@ function openMenu()
         title    = _U('ListingTitle'),	
         description = "Created by DefectGaming's FuryFight3r",
         elements = {
+            {label = "Cleaner/Off Duty", value = 'clean'},	
             {label = _U('Cashier'), value = 'cashier'},		
             {label = _U('Cook'), value = 'cook'},
             {label = _U('Deliv'), value = 'deliv'}
         }
     },
-    function(data, menu)									
+    function(data, menu)
+        if data.current.value == 'clean' then
+            if Config.EnablePlayerClerk == true then
+                if currentJob == 'clean' then
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = "You are already a Cleaner/Off Duty", type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('error', "You are already a Cleaner/Off Duty")
+                    end
+                else
+                    currentJob = 'clean'
+                    setJobName(currentJob)
+                    if Config.EnablePNotify == true and Config.EnableMythic == false then
+                        exports.pNotify:SendNotification({text = "You are now a Cleaner / Off Duty", type = "success", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                    elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                        exports['mythic_notify']:DoHudText('success', "You are now a Cleaner / Off Duty")
+                    end 
+                    onDuty = false
+                    isDelivering = false
+                    hasOrder = false
+                    hasTakenOrder = false
+                end
+            else
+                if Config.EnablePNotify == true and Config.EnableMythic == false then
+                    exports.pNotify:SendNotification({text = _U('CashierError1'), type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                elseif Config.EnablePNotify == false and Config.EnableMythic == true then
+                    exports['mythic_notify']:DoHudText('error', _U('CashierError1'))
+                end
+            end
+        end
         if data.current.value == 'cashier' then
             if Config.EnablePlayerClerk == true then
                 if currentJob == 'cashier' then
