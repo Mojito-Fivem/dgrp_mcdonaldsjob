@@ -7,6 +7,12 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 
 	TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end) 
 
+	RegisterServerEvent('dgrp_mcdonalds:setCleanJob')
+		AddEventHandler('dgrp_mcdonalds:setCleanJob', function()
+		local xPlayer = ESX.GetPlayerFromId(source)
+		xPlayer.setJob('McDonalds', 0)
+	end)
+
 	RegisterServerEvent('dgrp_mcdonalds:setCashierJob')
 		AddEventHandler('dgrp_mcdonalds:setCashierJob', function()
 		local xPlayer = ESX.GetPlayerFromId(source)
@@ -23,6 +29,12 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 		AddEventHandler('dgrp_mcdonalds:setDelivJob', function()
 		local xPlayer = ESX.GetPlayerFromId(source)
 		xPlayer.setJob('McDonalds', 3)
+	end)
+
+	RegisterServerEvent('dgrp_mcdonalds:fireWorker')
+		AddEventHandler('dgrp_mcdonalds:fireWorker', function()
+		local xPlayer = ESX.GetPlayerFromId(source)
+		xPlayer.setJob('unemployed', 0)
 	end)
 
 	RegisterServerEvent('dgrp_mcdonalds:addToMealInvent')
@@ -81,6 +93,7 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 
 		TriggerClientEvent('esx_status:add', source, 'thirst', 200000)
 		TriggerClientEvent('esx_basicneeds:onDrink', source)
+		TriggerClientEvent('dgrp_mcdonalds:consumedItem', source, 1)
 		xPlayer.showNotification("~b~You drank a ~y~McDonalds ~b~ Drink.")
 	end)
 
@@ -90,6 +103,7 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 
 		TriggerClientEvent('esx_status:add', source, 'hunger', 50000)
 		TriggerClientEvent('esx_basicneeds:onEat', source)
+		TriggerClientEvent('dgrp_mcdonalds:consumedItem', source, 2)
 		xPlayer.showNotification("~b~You ate some ~y~McDonalds ~b~ Fries.")
 	end)
 
@@ -99,6 +113,7 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 
 		TriggerClientEvent('esx_status:add', source, 'hunger', 150000)
 		TriggerClientEvent('esx_basicneeds:onEat', source)
+		TriggerClientEvent('dgrp_mcdonalds:consumedItem', source, 3)
 		xPlayer.showNotification("~b~You ate a ~y~McDonalds ~b~ Burger.")
 	end)
 
@@ -109,6 +124,7 @@ if GetCurrentResourceName() == 'dgrp_mcdonalds' or GetCurrentResourceName() == '
 		TriggerClientEvent('esx_status:add', source, 'hunger', 200000)
 		TriggerClientEvent('esx_status:add', source, 'thirst', 200000)
 		TriggerClientEvent('esx_basicneeds:onEat', source)
+		TriggerClientEvent('dgrp_mcdonalds:consumedItem', source, 4)
 		xPlayer.showNotification("~b~You ate and drank a ~y~McDonalds ~b~Meal.")
 	end)
 else
