@@ -326,29 +326,47 @@ function taskTrigger(zone)
         deleteCar()
     end
 end
+
+workvehicles = {
+	"nrg",
+	"vwcaddy",
+}
+
+function isCarWorkVehicle(carName)
+	for _, workCar in pairs(workvehicles) do
+		if carName == workCar then
+			return true
+		end
+	end
+	return false
+end
+
 --Check if Inside work Vehicle
---[[Citizen.CreateThread(function()
+Citizen.CreateThread(function()
     while true do
         Citizen.Wait(500)
         if IsPedInAnyVehicle(playerPed, false) then
-           if isMyCar() then
+            local ped = GetPlayerPed(-1)
+            local vehicle = GetVehiclePedIsIn(ped,false)
+            local modelName = GetEntityModel(vehicle)
+            local model = GetDisplayNameFromVehicleModel(modelName)
+            if not isCarWorkVehicle(model) then
                 if currentJob == 'deliv' and onDuty and isDriveDelivering then
-                    if dDeliveryCoords ~= nil then
-                        setGPS(dDeliveryCoords)
-                    else
-                        dPrint("Delivery Cords are NIL unable to re-assign GPS Blip")
-                    end
-                end
-            else
-                if currentJob == 'deliv' and onDuty and isDriveDelivering then
-                    RemoveBlip(Blips['deliver'])
+                    if IsPedSittingInAnyVehicle(ped) then 
+                        SetEntityAsMissionEntity(vehicle,true, true)
+                        TaskLeaveVehicle(PlayerPedId(),vehicle, 0)
+                        if Config.EnablePNotify then
+                            exports.pNotify:SendNotification({text = "This Vehicle is not suitable for this job.", type = "error", timeout = 2000, layout = "centerLeft", queue = "left", animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}})
+                        elseif Config.EnableMythic then
+                            exports['mythic_notify']:SendAlert('error', "This Vehicle is not suitable for this job.")
+                        end
+                    end 
                 end
             end 
-        else
-            RemoveBlip(Blips['deliver'])
         end
     end
-end)]]
+end)
+
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)		
